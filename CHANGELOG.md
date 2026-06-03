@@ -2,6 +2,13 @@
 
 All notable changes to Cartomap are documented here. Versions follow [SemVer](https://semver.org).
 
+## 0.4.2
+### Fixed
+- **Python relative imports now resolve in the generic adapter.** Multi-level relative imports like
+  `from ..pkg.mod import x` (and single-dot `from .util import x`) were silently dropped; they now
+  resolve to the correct file, improving `affected` / hub accuracy for Python projects. Python
+  externals are also reduced to the top-level package (`os.path` → `os`).
+
 ## 0.4.1
 ### Fixed
 - **Plugin/package version drift** — `.claude-plugin/plugin.json` was stuck at `0.3.1`; it now
