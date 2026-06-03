@@ -137,7 +137,8 @@ available in your project (most TS projects already do).
 
 ## Roadmap
 
-- More language heuristics, interactive `graph.html`, MCP server for live graph queries
+- Incremental builds (cache by mtime/hash), more language heuristics, interactive `graph.html`,
+  MCP server for live graph queries
 
 ## Security
 
