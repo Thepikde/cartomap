@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/cartomap.svg)](https://www.npmjs.com/package/cartomap)
 [![CI](https://github.com/Thepikde/cartomap/actions/workflows/ci.yml/badge.svg)](https://github.com/Thepikde/cartomap/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/npm/l/cartomap.svg)](LICENSE)
+[![Donate](https://img.shields.io/badge/donate-PayPal-ff6a3d?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=5WWSBNR6GSWYA)
 
 > A living, always-current map of your codebase — so AI assistants (and humans) instantly know what's what.
 
@@ -144,6 +145,12 @@ Cartomap runs **entirely offline** with **zero runtime dependencies** — no net
 telemetry. It reads only the source under your configured `roots` (plus manifests), never executes
 your app code, and writes only to `.cartomap/`. See [`SECURITY.md`](SECURITY.md) for the full
 posture and how to report a vulnerability.
+
+## Support
+
+Cartomap is free and MIT-licensed. If it saves you time (or tokens), you can
+[**buy me a coffee** ☕](https://www.paypal.com/donate/?hosted_button_id=5WWSBNR6GSWYA) —
+entirely optional, always appreciated.
 
 ## License
 
