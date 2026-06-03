@@ -122,3 +122,13 @@ test("ignore matching is path-segment aware (no 'test' → 'contest')", () => {
   assert.equal(matchesIgnore("src/a.test.ts", ".test."), true, "dotted filename fragment still matches");
   assert.equal(matchesIgnore("src/atestb.ts", "lib"), false, "unrelated pattern doesn't match");
 });
+
+test("python: relative imports resolve (single- and multi-dot)", async () => {
+  const g = await run("python");
+  // single-dot auf Root-Ebene: app.py -> from .util
+  assert.ok(g.files["app.py"]?.imports.includes("util.py"), "from .util → util.py");
+  // mehrstufig aus einem Subpaket: service/core.py -> from ..util  (der Review-Fall)
+  assert.ok(g.files["service/core.py"]?.imports.includes("util.py"), "from ..util → util.py");
+  // single-dot innerhalb des Subpakets: service/helpers.py -> from .core
+  assert.ok(g.files["service/helpers.py"]?.imports.includes("service/core.py"), "from .core → service/core.py");
+});
