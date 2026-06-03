@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartomap — eine lebende Karte deiner Codebase fürs KI-Coding</title>
+<meta name="description" content="Cartomap führt eine stets aktuelle, git-versionierte Karte deiner Codebase — Routen, Datenmodelle, Hubs, Abhängigkeiten — damit deine KI das Terrain kennt, statt zu raten. Open Source, null Abhängigkeiten.">
+<meta name="theme-color" content="#0a0f0d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🗺️%3C/text%3E%3C/svg%3E">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cartomap — eine lebende Karte deiner Codebase">
+<meta property="og:description" content="Eine stets aktuelle, git-versionierte Karte deiner Codebase, damit KI-Assistenten sofort das Terrain kennen.">
+<meta property="og:url" content="https://cartomap.thepik.de/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cartomap — eine lebende Karte deiner Codebase">
+<meta name="twitter:description" content="Eine stets aktuelle, git-versionierte Karte deiner Codebase, damit KI-Assistenten sofort das Terrain kennen.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+
+<style>
+/* ====================================================================
+   Cartomap — Landing Page
+   Aesthetik: topografische Vermessungskarte (Dark Mode)
+   Standardsprache Deutsch · DE/EN-Umschalter
+   ==================================================================== */
+
+:root{
+  --ink:#0a0f0d; --ink-2:#0c120f; --ink-3:#101813;
+  --panel:rgba(20,30,25,.46);
+  --panel-solid:#0f1612;
+  --line:rgba(126,176,150,.16);
+  --line-2:rgba(126,176,150,.30);
+  --paper:#ece6d6; --paper-2:#cdd2c5; --dim:#8c968a; --faint:#5d685c;
+  --accent:#ff6a3d; --accent-deep:#e0532a; --sea:#5ec4a8; --brass:#c9a85e;
+  --r:16px; --maxw:1140px;
+  --display:"Clash Display","Satoshi",system-ui,sans-serif;
+  --body:"Satoshi",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);
+  line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow-x:hidden;position:relative;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(255,106,61,.30);color:#fff}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:5px}
+img,svg{display:block}
+section[id]{scroll-margin-top:84px}
+
+/* --- Hintergrund-Ebenen: Raster, Höhenlinien, Korn, Vignette ---------- */
+.layer{position:fixed;inset:0;pointer-events:none}
+.grid-layer{z-index:-4;background-image:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='148' height='148'%3E%3Cg stroke='%237eb096' stroke-opacity='.18' stroke-width='1'%3E%3Cpath d='M74 67v14M67 74h14'/%3E%3C/g%3E%3C/svg%3E");
+  background-position:center;opacity:.5;
+  mask-image:radial-gradient(120% 90% at 50% 0%,#000 0%,#000 55%,transparent 100%)}
+.topo{z-index:-3;width:100%;height:100%}
+.topo path{fill:none;stroke:var(--line);stroke-width:1.1;vector-effect:non-scaling-stroke}
+.glow-layer{z-index:-2;background:
+  radial-gradient(900px 520px at 84% -6%, rgba(94,196,168,.10), transparent 62%),
+  radial-gradient(760px 460px at 8% 8%, rgba(255,106,61,.07), transparent 60%),
+  radial-gradient(1100px 700px at 50% 116%, rgba(94,196,168,.06), transparent 60%)}
+.grain{z-index:60;opacity:.04;mix-blend-mode:overlay;background-image:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.vignette{z-index:-1;box-shadow:inset 0 0 240px 40px rgba(0,0,0,.55)}
+
+/* --- Layout ----------------------------------------------------------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.5rem;position:relative}
+section{position:relative;padding:6rem 0}
+.kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent);display:inline-flex;align-items:center;gap:.6rem;margin:0 0 1rem}
+.kicker::before{content:"";width:26px;height:1px;background:var(--accent);opacity:.7}
+h1,h2,h3{margin:0;font-family:var(--display);font-weight:600;letter-spacing:-.018em;line-height:1.04}
+h2{font-size:clamp(1.85rem,4.4vw,2.9rem);font-weight:600}
+h3{font-size:1.18rem;font-weight:600;letter-spacing:-.01em}
+em,.ital{font-style:italic}
+.lead{color:var(--paper-2);font-size:clamp(1.02rem,1.6vw,1.16rem);max-width:60ch;line-height:1.66}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.acc{color:var(--accent)}.sea{color:var(--sea)}
+
+/* --- Vermessungs-Trennlinie (Breitengrad) ----------------------------- */
+.lat{display:flex;align-items:center;gap:1rem;color:var(--faint);font-family:var(--mono);font-size:.66rem;letter-spacing:.18em}
+.lat::before,.lat::after{content:"";height:1px;background:var(--line-2);flex:1}
+.lat span{display:inline-flex;gap:.5rem;align-items:center}
+.lat i{width:1px;height:7px;background:var(--line-2);display:inline-block}
+
+/* --- Navigation ------------------------------------------------------- */
+header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px) saturate(120%);
+  background:linear-gradient(180deg,rgba(10,15,13,.86),rgba(10,15,13,.55));
+  border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:66px;max-width:var(--maxw);margin:0 auto;padding:0 1.5rem}
+.brand{display:flex;align-items:center;gap:.7rem;font-family:var(--display);font-weight:600;font-size:1.18rem;letter-spacing:-.01em}
+.brand .mk{width:26px;height:26px;flex:none}
+.nav-links{display:flex;align-items:center;gap:2rem;font-family:var(--mono);font-size:.78rem;letter-spacing:.04em}
+.nav-links a{color:var(--dim);transition:color .18s}
+.nav-links a:hover{color:var(--paper)}
+.nav-links .ghbtn{color:var(--paper)}
+.nav-links a.donate-nav{color:var(--accent)}
+.nav-links a.donate-nav:hover{color:#ff8a63}
+
+/* --- Sprach-Umschalter (DE/EN) ---------------------------------------- */
+.lang{display:inline-flex;border:1px solid var(--line-2);border-radius:9px;overflow:hidden}
+.lang button{appearance:none;border:0;background:transparent;color:var(--dim);font-family:var(--mono);
+  font-size:.72rem;letter-spacing:.06em;padding:.36rem .56rem;cursor:pointer;transition:.16s}
+.lang button:hover{color:var(--paper)}
+.lang button.on{background:var(--accent);color:#1a0c06}
+.lang button+button{border-left:1px solid var(--line-2)}
+
+/* --- Buttons ---------------------------------------------------------- */
+.btn{position:relative;display:inline-flex;align-items:center;gap:.6em;padding:.82em 1.35em;border-radius:11px;
+  font-family:var(--mono);font-weight:500;font-size:.84rem;letter-spacing:.02em;cursor:pointer;
+  border:1px solid transparent;transition:transform .18s ease,box-shadow .18s ease,background .18s,border-color .18s;overflow:hidden}
+.btn-primary{background:var(--accent);color:#1a0c06;box-shadow:0 10px 30px -12px rgba(255,106,61,.7)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 40px -12px rgba(255,106,61,.85);background:#ff7a50}
+.btn-ghost{background:rgba(236,230,214,.035);border-color:var(--line-2);color:var(--paper)}
+.btn-ghost:hover{background:rgba(236,230,214,.08);transform:translateY(-2px);border-color:var(--sea)}
+.btn svg{width:15px;height:15px}
+
+/* --- Hero ------------------------------------------------------------- */
+.hero{padding:5.5rem 0 4rem;min-height:88vh;display:flex;align-items:center}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:3.5rem;align-items:center;width:100%}
+.hero h1{font-size:clamp(2.7rem,6.6vw,4.7rem);font-weight:600;letter-spacing:-.03em;max-width:13ch}
+.hero h1 em{color:var(--accent);font-weight:600}
+.hero .lead{margin:1.6rem 0 0}
+.cta-row{display:flex;flex-wrap:wrap;gap:.9rem;margin:2.1rem 0 0}
+.pills{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.4rem 0 0}
+.pill{font-family:var(--mono);font-size:.7rem;letter-spacing:.04em;color:var(--dim);
+  border:1px solid var(--line);background:rgba(236,230,214,.02);padding:.36rem .7rem;border-radius:999px}
+.pill b{color:var(--sea);font-weight:500}
+.coord{position:absolute;font-family:var(--mono);font-size:.64rem;letter-spacing:.12em;color:var(--faint);user-select:none}
+.coord.tr{top:-1.5rem;right:0}
+
+/* --- Terminal --------------------------------------------------------- */
+.term{position:relative;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;
+  background:linear-gradient(180deg,#0e1512,#0a100d);
+  box-shadow:0 40px 80px -36px rgba(0,0,0,.85),inset 0 1px 0 rgba(236,230,214,.04)}
+.term::after{content:"";position:absolute;top:10px;right:10px;width:14px;height:14px;
+  border-top:1px solid var(--accent);border-right:1px solid var(--accent);opacity:.5}
+.term-bar{display:flex;align-items:center;gap:.5rem;padding:.72rem .95rem;border-bottom:1px solid var(--line)}
+.term-bar .dot{width:10px;height:10px;border-radius:50%;background:#2a352d}
+.term-bar .dot.r{background:#ff6a3d}.term-bar .dot.y{background:#c9a85e}.term-bar .dot.g{background:#5ec4a8}
+.term-bar .ttl{margin-left:.4rem;font-family:var(--mono);font-size:.7rem;color:var(--faint);letter-spacing:.04em}
+.term pre{margin:0;padding:1.15rem 1.2rem;font-family:var(--mono);font-size:.82rem;line-height:1.75;overflow-x:auto;color:#c4cec2}
+.term .cursor{display:inline-block;width:8px;height:1.05em;background:var(--accent);vertical-align:-2px;animation:blink 1.05s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.g{color:var(--sea)}.c{color:#9fd3bf}.t{color:var(--accent)}.d{color:var(--faint)}.y{color:var(--brass)}.p{color:var(--paper)}
+.out{opacity:0}
+.out.show{opacity:1;transition:opacity .35s ease}
+
+/* --- Copy-Command ----------------------------------------------------- */
+.cmd{display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  background:var(--panel-solid);border:1px solid var(--line-2);border-radius:11px;
+  padding:.62rem .7rem .62rem 1rem;font-family:var(--mono);font-size:.86rem}
+.cmd .pfx{color:var(--accent);margin-right:.6rem;user-select:none}
+.cmd code{color:var(--paper)}
+.copy{flex:none;font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;
+  border:1px solid var(--line-2);background:rgba(236,230,214,.04);color:var(--dim);
+  padding:.38rem .62rem;border-radius:8px;cursor:pointer;transition:.16s}
+.copy:hover{color:var(--paper);border-color:var(--sea)}
+.copy.done{color:var(--sea);border-color:var(--sea)}
+
+/* --- Cards & Grids ---------------------------------------------------- */
+.grid{display:grid;gap:1.1rem}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.card{position:relative;background:linear-gradient(180deg,rgba(236,230,214,.028),rgba(236,230,214,.008));
+  border:1px solid var(--line);border-radius:var(--r);padding:1.6rem;transition:transform .22s ease,border-color .22s ease,background .22s}
+.card::before,.card::after{content:"";position:absolute;width:12px;height:12px;opacity:0;transition:opacity .25s ease}
+.card::before{top:10px;left:10px;border-top:1px solid var(--accent);border-left:1px solid var(--accent)}
+.card::after{bottom:10px;right:10px;border-bottom:1px solid var(--accent);border-right:1px solid var(--accent)}
+.card:hover{transform:translateY(-4px);border-color:var(--line-2);background:linear-gradient(180deg,rgba(236,230,214,.05),rgba(236,230,214,.015))}
+.card:hover::before,.card:hover::after{opacity:.65}
+.card .sym{width:34px;height:34px;margin-bottom:1rem;color:var(--accent)}
+.card h3{margin-bottom:.5rem}
+.card p{color:var(--dim);font-size:.94rem;margin:0}
+.card code{font-family:var(--mono);color:var(--paper-2);font-size:.88em}
+
+ul.legend{list-style:none;padding:0;margin:.8rem 0 0}
+ul.legend li{position:relative;padding-left:1.7rem;color:var(--dim);margin:.55rem 0;font-size:.95rem}
+ul.legend li::before{content:"";position:absolute;left:0;top:.5em;width:9px;height:9px;border:1px solid var(--sea);
+  transform:rotate(45deg);background:rgba(94,196,168,.15)}
+
+/* --- Stats ------------------------------------------------------------ */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin-top:3rem}
+.stat{border:1px solid var(--line);border-radius:var(--r);padding:1.4rem 1.3rem;background:rgba(236,230,214,.015)}
+.stat .n{font-family:var(--display);font-weight:600;font-size:clamp(1.9rem,4vw,2.6rem);line-height:1;letter-spacing:-.02em}
+.stat .n .u{color:var(--accent);font-size:.6em}
+.stat .l{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:.6rem}
+
+.inset-label{font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:.7rem;display:block}
+
+/* --- Reveal-Animationen ----------------------------------------------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0)*90ms)}
+.reveal.in{opacity:1;transform:none}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.hero .stg{opacity:0;animation:rise .85s cubic-bezier(.2,.7,.2,1) forwards}
+.hero .stg.d1{animation-delay:.05s}.hero .stg.d2{animation-delay:.18s}.hero .stg.d3{animation-delay:.31s}
+.hero .stg.d4{animation-delay:.44s}.hero .stg.d5{animation-delay:.57s}.hero .stg.d6{animation-delay:.2s}
+
+/* --- Band / Final CTA ------------------------------------------------- */
+.band{position:relative;border:1px solid var(--line-2);border-radius:22px;padding:4rem 1.5rem;text-align:center;overflow:hidden;
+  background:radial-gradient(120% 140% at 50% 0%,rgba(255,106,61,.10),transparent 55%),linear-gradient(180deg,rgba(20,30,25,.5),rgba(12,18,15,.5))}
+.band .you{position:absolute;left:50%;top:1.4rem;transform:translateX(-50%);font-family:var(--mono);font-size:.64rem;letter-spacing:.22em;color:var(--accent)}
+.band h2{margin:1rem 0 .7rem;font-size:clamp(2rem,5vw,3.2rem)}
+.donate{margin:1.1rem 0 0;font-family:var(--mono);font-size:.78rem;letter-spacing:.02em;color:var(--dim)}
+.donate a{color:var(--accent);border-bottom:1px solid rgba(255,106,61,.4);padding-bottom:1px;transition:color .16s,border-color .16s}
+.donate a:hover{color:#ff8a63;border-color:var(--accent)}
+
+/* --- Footer ----------------------------------------------------------- */
+footer{border-top:1px solid var(--line);padding:3rem 0;color:var(--faint);font-family:var(--mono);font-size:.76rem;letter-spacing:.03em}
+.foot-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.1rem}
+.foot-in nav a{color:var(--dim);margin-left:1.6rem;transition:color .16s}
+.foot-in nav a:first-child{margin-left:0}
+.foot-in nav a:hover{color:var(--paper)}
+
+/* --- Responsive ------------------------------------------------------- */
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:2.4rem}
+  .hero{min-height:auto;padding:3.5rem 0}
+  .g3,.g2{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .nav-links a:not(.ghbtn){display:none}
+  section{padding:4.5rem 0}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}.hero .stg{opacity:1}.out{opacity:1}.cursor{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Hintergrund-Ebenen -->
+<div class="layer grid-layer" aria-hidden="true"></div>
+<svg class="layer topo" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <g class="layer-a">
+    <path d="M1150 150 C1210 140 1280 175 1280 235 C1280 295 1215 330 1150 320 C1095 312 1055 270 1068 215 C1078 172 1108 156 1150 150 Z"/>
+    <path d="M1140 92 C1240 80 1342 132 1348 232 C1354 332 1268 394 1156 386 C1064 379 990 312 1002 222 C1012 146 1066 102 1140 92 Z"/>
+    <path class="ring" d="M1118 30 C1270 14 1414 94 1424 240 C1434 386 1300 472 1148 460 C1026 450 926 356 940 230 C952 118 1022 42 1118 30 Z" stroke="rgba(255,106,61,.22)"/>
+    <path d="M1095 -30 C1300 -48 1500 60 1512 256 C1524 452 1330 556 1130 540 C980 528 858 410 876 240 C890 96 980 -14 1095 -30 Z"/>
+  </g>
+  <g class="layer-b">
+    <path d="M250 642 C320 630 392 670 388 732 C384 794 318 826 250 814 C196 804 160 762 176 708 C188 666 210 650 250 642 Z"/>
+    <path d="M235 582 C340 568 452 622 456 728 C460 834 366 900 250 890 C156 882 84 810 100 710 C112 630 162 594 235 582 Z"/>
+    <path d="M214 520 C362 504 514 578 520 726 C526 874 392 966 240 954 C146 946 60 866 78 752 C92 648 150 532 214 520 Z"/>
+  </g>
+  <g class="layer-c">
+    <path d="M-40 470 C220 430 360 560 560 520 C760 480 880 360 1120 410 C1300 448 1380 520 1500 500"/>
+    <path d="M-40 560 C200 540 340 650 540 610 C740 570 900 470 1120 510 C1320 548 1400 600 1500 588"/>
+    <path d="M-40 250 C260 210 420 120 640 170 C860 220 1010 150 1250 120 C1380 104 1440 120 1520 120"/>
+  </g>
+</svg>
+<div class="layer glow-layer" aria-hidden="true"></div>
+<div class="layer vignette" aria-hidden="true"></div>
+<div class="layer grain" aria-hidden="true"></div>
+
+<!-- Navigation -->
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top">
+      <svg class="mk" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M4 8l8-3 8 3 8-3v22l-8 3-8-3-8 3z" stroke-opacity=".55"/>
+        <path d="M12 5v22M20 8v22" stroke-opacity=".55"/>
+        <circle cx="16" cy="14" r="3.2" stroke="#ff6a3d"/>
+        <path d="M16 17v6" stroke="#ff6a3d"/>
+      </svg>
+      Cartomap
+    </a>
+    <nav class="nav-links">
+      <a href="#why" data-i18n="nav.why">Warum</a>
+      <a href="#start">Start</a>
+      <a href="#impact" data-i18n="nav.impact">Impact</a>
+      <a href="#how" data-i18n="nav.how">Funktionsweise</a>
+      <a href="#plugin">Plugin</a>
+      <a class="donate-nav" href="https://www.paypal.com/donate/?hosted_button_id=5WWSBNR6GSWYA" target="_blank" rel="noopener" data-i18n="nav.donate">Spende ☕</a>
+      <div class="lang" role="group" aria-label="Sprache / Language">
+        <button type="button" data-lang="de" class="on">DE</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+      <a class="ghbtn" href="https://github.com/Thepikde/cartomap" target="_blank" rel="noopener">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<main id="top" class="wrap hero">
+  <div class="hero-grid">
+    <div>
+      <span class="coord tr">N 48°08.42′ · E 011°34.10′</span>
+      <p class="kicker stg d1" data-i18n="hero.kicker">Open Source · MIT-Lizenz</p>
+      <h1 class="stg d2" data-i18n="hero.h1">Eine <em>lebende</em> Karte deiner&nbsp;Codebase.</h1>
+      <p class="lead stg d3" data-i18n="hero.lead">Cartomap führt eine stets aktuelle, git-versionierte Karte deines Projekts — Routen,
+        Datenmodelle, Hubs, Abhängigkeiten — damit deine KI das <span class="sea">Terrain</span> kennt, statt zu raten und Tokens zu verbrennen.</p>
+      <div class="cta-row stg d4">
+        <a class="btn btn-primary" href="#start"><span data-i18n="hero.cta1">Repo kartieren</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h9M8 4l4 4-4 4"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="https://www.npmjs.com/package/cartomap" target="_blank" rel="noopener" data-i18n="hero.cta2">Auf npm ansehen ↗</a>
+      </div>
+      <div class="pills stg d5">
+        <span class="pill" data-i18n="hero.pill1"><b>~2–4k</b> Token-Karte</span>
+        <span class="pill" data-i18n="hero.pill2">statt <b>100k+</b> Roh-Dateien</span>
+        <span class="pill" data-i18n="hero.pill3"><b>0</b> Abhängigkeiten</span>
+        <span class="pill"><b>Node</b> ≥18</span>
+      </div>
+    </div>
+
+    <div class="stg d6">
+      <div class="term">
+        <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">~/my-app — survey</span></div>
+<pre><span class="d">$</span> <span class="t"><span id="type"></span></span><span class="cursor" id="cur"></span>
+<span class="out o1"><span class="g">✓</span> <span class="p">detected</span>   <span class="c">Next.js · TypeScript · Prisma</span></span>
+<span class="out o2"><span class="g">✓</span> <span class="p">charted</span>    <span class="c">32 files · 8 routes · 4 models</span></span>
+<span class="out o3"><span class="g">✓</span> <span class="p">wrote</span>      <span class="c">.cartomap/ARCHITECTURE.md</span>  <span class="d">(41 ms)</span></span>
+<span class="out o4"><span class="g">✓</span> <span class="p">hooked</span>     <span class="d">pre-commit → map stays current</span></span>
+<span class="out o5"><span class="d" data-i18n="hero.termNote"># Deine KI liest jetzt zuerst das Terrain.</span></span></pre>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="wrap"><div class="lat"><span>48°N</span><i></i><i></i><i></i></div></div>
+
+<!-- Why -->
+<section id="why" class="wrap">
+  <p class="kicker reveal" data-i18n="why.kicker">Das Problem</p>
+  <h2 class="reveal" style="--i:1;max-width:18ch" data-i18n="why.h2">Große Codebases lassen KI-Assistenten <em>raten.</em></h2>
+  <p class="lead reveal" style="--i:2;margin-top:1rem" data-i18n="why.lead">Sie halluzinieren APIs und übersehen übergreifende Zusammenhänge, weil sie immer nur
+    ein paar Dateien sehen. Cartomap gibt ihnen — und neuen Teammitgliedern — das ganze Terrain in wenigen tausend Tokens.</p>
+
+  <div class="grid g3" style="margin-top:2.6rem">
+    <div class="card reveal" style="--i:0">
+      <svg class="sym" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7l8-3 8 3 8-3v21l-8 3-8-3-8 3z"/><path d="M12 4v21M20 7v21"/></svg>
+      <h3 data-i18n="why.c1h">Eine Quelle der Wahrheit</h3>
+      <p data-i18n="why.c1p">Routen, Modelle, Hubs und verwaiste Module in einer lesbaren Karte — die Vogelperspektive, die deine KI nie hatte.</p>
+    </div>
+    <div class="card reveal" style="--i:1">
+      <svg class="sym" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M28 16a12 12 0 1 1-3.5-8.5"/><path d="M28 5v6h-6"/></svg>
+      <h3 data-i18n="why.c2h">Wird nie veraltet</h3>
+      <p data-i18n="why.c2p">Ein Pre-Commit-Hook vermisst die Karte bei jedem Commit neu und staged sie. Immer aktuell — und blockiert nie deinen Commit.</p>
+    </div>
+    <div class="card reveal" style="--i:2">
+      <svg class="sym" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="16" cy="16" r="12"/><path d="M16 4v24M4 16h24" stroke-opacity=".5"/><circle cx="16" cy="16" r="4" stroke="currentColor"/></svg>
+      <h3 data-i18n="why.c3h">Passt sich deinem Stack an</h3>
+      <p data-i18n="why.c3p">Erkennt Sprache, Framework, Quell-Roots und Pfad-Aliase automatisch — und wählt den passenden Analyzer für dein Projekt.</p>
+    </div>
+  </div>
+
+  <div class="stats" id="stats">
+    <div class="stat reveal" style="--i:0"><div class="n"><span class="u">≈</span><span data-count="4">0</span><span class="u">k</span></div><div class="l" data-i18n="why.s1">Tokens pro Karte</div></div>
+    <div class="stat reveal" style="--i:1"><div class="n"><span data-count="100">0</span><span class="u">k+</span></div><div class="l" data-i18n="why.s2">Tokens an Dateien gespart</div></div>
+    <div class="stat reveal" style="--i:2"><div class="n"><span data-count="9">0</span><span class="u">+</span></div><div class="l" data-i18n="why.s3">Sprachen kartiert</div></div>
+    <div class="stat reveal" style="--i:3"><div class="n"><span data-count="41">0</span><span class="u"> ms</span></div><div class="l" data-i18n="why.s4">um 32 Dateien zu vermessen</div></div>
+  </div>
+</section>
+
+<div class="wrap"><div class="lat"><span>ROUTE</span><i></i><i></i><i></i></div></div>
+
+<!-- Start -->
+<section id="start" class="wrap">
+  <p class="kicker reveal" data-i18n="start.kicker">Schnellstart</p>
+  <h2 class="reveal" style="--i:1" data-i18n="start.h2">Zwei Wege hinein — beide erstklassig.</h2>
+  <p class="lead reveal" style="--i:2;margin-top:1rem" data-i18n="start.lead">Starte am ersten Tag und das Gedächtnis wächst organisch mit deinem Projekt.
+    Oder setze es auf ein bestehendes Repo — es erfasst das aktuelle Terrain sofort.</p>
+
+  <div class="grid g2" style="margin-top:2.4rem">
+    <div class="card reveal" style="--i:0">
+      <span class="inset-label" data-i18n="start.glabel">Neues Projekt · perfekt ab Tag eins</span>
+      <h3 data-i18n="start.gh">Greenfield</h3>
+      <p style="margin:.4rem 0 1.2rem" data-i18n="start.gp">Ordner + Git + Cartomap anlegen, dann normal entwickeln. Die Karte wächst mit jedem Commit.</p>
+      <div class="cmd"><span><span class="pfx">$</span><code>cartomap new my-app</code></span>
+        <button class="copy" data-copy="cartomap new my-app" data-i18n="copy">Kopieren</button></div>
+    </div>
+    <div class="card reveal" style="--i:1">
+      <span class="inset-label" data-i18n="start.elabel">Bestehendes Projekt · sofortige Momentaufnahme</span>
+      <h3 data-i18n="start.eh">Bestehendes Repo</h3>
+      <p style="margin:.4rem 0 1.2rem" data-i18n="start.ep">Erkennt deinen Stack &amp; deine Pfade und vermisst beim ersten Lauf die komplette Karte.</p>
+      <div class="cmd"><span><span class="pfx">$</span><code>cartomap init</code></span>
+        <button class="copy" data-copy="cartomap init" data-i18n="copy">Kopieren</button></div>
+    </div>
+  </div>
+
+  <div class="reveal" style="--i:2;margin-top:1.5rem;max-width:520px">
+    <span class="inset-label" data-i18n="start.ilabel">Global installieren</span>
+    <div class="cmd"><span><span class="pfx">$</span><code>npm i -g cartomap</code></span>
+      <button class="copy" data-copy="npm i -g cartomap" data-i18n="copy">Kopieren</button></div>
+    <p style="color:var(--faint);font-family:var(--mono);font-size:.78rem;margin:.7rem 0 0" data-i18n="start.inote">…oder ohne Installation ausführen — <span style="color:var(--paper-2)">npx cartomap init</span></p>
+  </div>
+</section>
+
+<div class="wrap"><div class="lat"><span data-i18n="div.detail">KARTENDETAIL</span><i></i><i></i><i></i></div></div>
+
+<!-- What you get -->
+<section class="wrap">
+  <p class="kicker reveal" data-i18n="get.kicker">Was du bekommst</p>
+  <h2 class="reveal" style="--i:1" data-i18n="get.h2">Ein Ordner, den deine KI zuerst liest.</h2>
+  <div class="grid g2" style="margin-top:2.4rem;align-items:start">
+    <div class="reveal" style="--i:0">
+      <div class="term">
+        <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">.cartomap/</span></div>
+<pre><span class="c">.cartomap/</span>
+├─ <span class="t">ARCHITECTURE.md</span>   <span class="d">the map (human-readable)</span>
+├─ graph.json        <span class="d">machine-readable graph</span>
+└─ <span class="c">memory/</span>
+   ├─ <span class="t">INDEX.md</span>       <span class="d">decisions &amp; project knowledge</span>
+   └─ decisions.md
+
+<span class="d"># plus a "Project map" block added to your</span>
+<span class="d"># CLAUDE.md / AGENTS.md → "read the map first"</span></pre>
+      </div>
+    </div>
+    <div class="reveal" style="--i:1">
+      <div class="term">
+        <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">ARCHITECTURE.md</span></div>
+<pre><span class="t"># 🗺️  my-app — Project Map</span>
+
+Stack   <span class="c">Next.js · TypeScript · Prisma</span>
+Sync    <span class="g">✓ up to date (main)</span>
+
+<span class="y">## Start here</span>
+app/layout.tsx          <span class="d">root layout</span>
+middleware.ts           <span class="d">runs on every request</span>
+
+<span class="y">## Routes</span>            <span class="d">8 pages · 5 API</span>
+/                       app/page.tsx
+/blog/<span class="t">:slug</span>             app/blog/[slug]/page.tsx
+/api/users  <span class="g">GET POST</span>   app/api/users/route.ts
+
+<span class="y">## Data models</span>       <span class="d">4</span>
+User    <span class="d">→ 12 files</span>
+Post    <span class="d">→  7 files</span>
+
+<span class="y">## Hubs</span> <span class="d">(most imported)</span>
+lib/db.ts          <span class="d">18 direct ·</span> <span class="t">27 affected</span>
+lib/auth.ts        <span class="d">11 direct ·</span> <span class="t">19 affected</span>
+
+<span class="y">## Orphaned modules</span>  <span class="d">2</span>
+lib/legacy/format.ts</pre>
+      </div>
+    </div>
+  </div>
+  <p class="reveal" style="--i:2;color:var(--faint);font-family:var(--mono);font-size:.8rem;margin-top:1.2rem" data-i18n="get.note">Die Karte ist standardmäßig englisch (echte CLI-Ausgabe) — mit <span style="color:var(--paper-2)">"lang":"de"</span> gibt das Tool auch deutsch aus.</p>
+</section>
+
+<div class="wrap"><div class="lat"><span data-i18n="div.impact">AUSWIRKUNG</span><i></i><i></i><i></i></div></div>
+
+<!-- Impact / affected -->
+<section id="impact" class="wrap">
+  <div class="grid g2" style="align-items:center;gap:3rem">
+    <div class="reveal">
+      <p class="kicker" data-i18n="impact.kicker">Impact-Analyse</p>
+      <h2 style="max-width:15ch" data-i18n="impact.h2">Was geht kaputt, wenn du das <em>anfasst?</em></h2>
+      <p class="lead" style="margin-top:1rem" data-i18n="impact.lead">Frag Cartomap nach dem Einschlagradius einer Änderung: welche Dateien — direkt und transitiv — von einer Datei abhängen, bevor du sie umbaust.</p>
+      <ul class="legend" style="margin-top:1.3rem">
+        <li data-i18n="impact.l1">Direkte <span style="color:var(--paper-2)">und</span> transitive Importeure</li>
+        <li data-i18n="impact.l2">Aus dem Graphen, den du schon hast — <code>--json</code> fürs Tooling</li>
+        <li data-i18n="impact.l3">Ehrliche Untergrenze: nur statische Imports</li>
+      </ul>
+    </div>
+    <div class="reveal" style="--i:1">
+      <div class="term">
+        <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">cartomap affected</span></div>
+<pre><span class="d">$</span> <span class="t">cartomap affected</span> <span class="c">src/lib/auth.ts</span>
+
+<span class="t">🗺️  Impact of changing</span>  <span class="p">src/lib/auth.ts</span>
+   <span class="p">23</span> files depend on it — <span class="g">6 direct</span>, <span class="y">17 indirect</span>.
+
+   <span class="d">Direct importers:</span>
+     <span class="g">•</span> src/middleware.ts
+     <span class="g">•</span> src/app/api/login/route.ts
+     <span class="g">•</span> src/lib/session.ts
+     <span class="d">… +3</span>
+
+   <span class="d">⚠️  Static imports only — a lower bound.</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="lat"><span data-i18n="div.sound">PEILUNGEN</span><i></i><i></i><i></i></div></div>
+
+<!-- How it adapts -->
+<section id="how" class="wrap">
+  <p class="kicker reveal" data-i18n="how.kicker">Wie es sich deinem Projekt anpasst</p>
+  <h2 class="reveal" style="--i:1" data-i18n="how.h2">Zwei Vermessungstiefen. Keine Konfiguration nötig.</h2>
+  <div class="grid g2" style="margin-top:2.4rem">
+    <div class="card reveal" style="--i:0">
+      <span class="inset-label acc" data-i18n="how.deepLabel">Tiefes Wasser · volle Peilung</span>
+      <h3>TypeScript / JavaScript</h3>
+      <p style="margin-top:.4rem" data-i18n="how.deepP">Echte TS-Compiler-Analyse — aufgelöste Imports &amp; Exports, Client-/Server-Komponenten, ORM-Modelle und Routen:</p>
+      <ul class="legend">
+        <li data-i18n="how.deep1">Next.js App- <span style="color:var(--paper-2)">und</span> Pages-Router</li>
+        <li data-i18n="how.deep2">NestJS-Controller, Express / Fastify / Koa</li>
+        <li data-i18n="how.deep3">Prisma- &amp; Drizzle-Modelle</li>
+        <li data-i18n="how.deep4">tsconfig- / jsconfig-Pfad-Aliase</li>
+      </ul>
+    </div>
+    <div class="card reveal" style="--i:1">
+      <span class="inset-label sea" data-i18n="how.shLabel">Flachwasser · strukturelle Vermessung</span>
+      <h3 data-i18n="how.shH">Alles andere</h3>
+      <p style="margin-top:.4rem" data-i18n="how.shP">Ein Datei-Graph plus Import-Heuristiken und ein Doku-Scan — nie ein Absturz, immer eine nützliche Karte:</p>
+      <ul class="legend">
+        <li>Python, Go, Rust, PHP, Ruby</li>
+        <li>Java / Kotlin, C / C++, C#</li>
+        <li data-i18n="how.sh3">Sinnvolle Defaults bei leeren oder unbekannten Stacks</li>
+      </ul>
+    </div>
+  </div>
+  <p class="reveal" style="--i:2;color:var(--faint);font-family:var(--mono);font-size:.82rem;margin-top:1.4rem;line-height:1.7" data-i18n="how.note">
+    Konfigurierbar über <span style="color:var(--paper-2)">cartomap.config.json</span> — Roots, Aliase, beobachtete „kritische" Pfade, Ausgabeordner.
+    Standard Englisch; mit <span style="color:var(--paper-2)">"lang":"de"</span> auf Deutsch.</p>
+</section>
+
+<div class="wrap"><div class="lat"><span data-i18n="div.upkeep">PFLEGE</span><i></i><i></i><i></i></div></div>
+
+<!-- Auto-update -->
+<section class="wrap">
+  <p class="kicker reveal" data-i18n="up.kicker">Auto-Update</p>
+  <h2 class="reveal" style="--i:1" data-i18n="up.h2">Es vermisst sich selbst neu.</h2>
+  <div class="grid g3" style="margin-top:2.4rem">
+    <div class="card reveal" style="--i:0">
+      <svg class="sym" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="16" cy="16" r="5"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M7 7l3 3M22 22l3 3M25 7l-3 3M10 22l-3 3"/></svg>
+      <h3 data-i18n="up.c1h">Bei jedem Commit</h3>
+      <p data-i18n="up.c1p">Ein Pre-Commit-Hook baut die Karte neu und staged sie — sie veraltet nie und blockiert nie deinen Commit.</p>
+    </div>
+    <div class="card reveal" style="--i:1">
+      <svg class="sym" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 16c0-6 4-10 10-10s10 4 10 10-4 10-10 10"/><path d="M16 16l6 6M11 16h.01"/></svg>
+      <h3 data-i18n="up.c2h">Husky-freundlich</h3>
+      <p data-i18n="up.c2p">Nutzt du schon Husky, lefthook oder einen eigenen Hook? Cartomap klinkt sich in dein bestehendes <code>pre-commit</code> ein, statt es zu ersetzen.</p>
+    </div>
+    <div class="card reveal" style="--i:2">
+      <svg class="sym" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4l11 6v12l-11 6-11-6V10z"/><path d="M16 4v12l11 6M16 16L5 22"/></svg>
+      <h3 data-i18n="up.c3h">Team-bereit</h3>
+      <p data-i18n="up.c3p">Der Hook ist im Repo eingecheckt. Teammitglieder führen einmal pro Checkout <code>cartomap install-hook</code> aus.</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="lat"><span>PLUGIN</span><i></i><i></i><i></i></div></div>
+
+<!-- Plugin -->
+<section id="plugin" class="wrap">
+  <div class="grid g2" style="align-items:center;gap:3rem">
+    <div class="reveal">
+      <p class="kicker" data-i18n="plugin.kicker">Claude-Code-Plugin</p>
+      <h2 style="max-width:14ch" data-i18n="plugin.h2">Ein Befehl und deine KI liest zuerst die Karte.</h2>
+      <p class="lead" style="margin-top:1rem" data-i18n="plugin.lead">Cartomap bringt ein Claude-Code-Plugin mit — zwei Slash-Befehle plus ein Skill, der jede
+        KI-Session in einem Cartomap-Projekt zuerst die Karte lesen lässt.</p>
+    </div>
+    <div class="reveal" style="--i:1">
+      <div class="term">
+        <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">Claude Code</span></div>
+<pre><span class="t">/plugin marketplace add</span> <span class="c">Thepikde/cartomap</span>
+<span class="t">/plugin install</span> <span class="c">cartomap@cartomap</span>
+
+<span class="d"># then, inside any project:</span>
+<span class="t">/cartomap:init</span>      <span class="d">set up the map</span>
+<span class="t">/cartomap:update</span>    <span class="d">re-survey it</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="wrap">
+  <div class="band reveal">
+    <span class="you" data-i18n="band.you">✦ DU BIST HIER ✦</span>
+    <h2 data-i18n="band.h2">Gib deiner KI eine&nbsp;<em>Karte.</em></h2>
+    <p class="lead" style="margin:0 auto 1.8rem;text-align:center" data-i18n="band.lead">Kostenlos, Open Source, offline — null Laufzeit-Abhängigkeiten.</p>
+    <div class="cta-row" style="justify-content:center">
+      <a class="btn btn-primary" href="https://www.npmjs.com/package/cartomap" target="_blank" rel="noopener">npm i -g cartomap</a>
+      <a class="btn btn-ghost" href="https://github.com/Thepikde/cartomap" target="_blank" rel="noopener" data-i18n="band.cta2">Auf GitHub favorisieren ↗</a>
+    </div>
+    <p class="donate" data-i18n="donate.text">Cartomap ist und bleibt kostenlos. Dankbar? <a href="https://www.paypal.com/donate/?hosted_button_id=5WWSBNR6GSWYA" target="_blank" rel="noopener">Spendier mir einen Kaffee ☕</a></p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer><div class="wrap foot-in">
+  <div>🗺️ CARTOMAP · MIT © THEPIK · NODE ≥18 · ZERO DEPS · OFFLINE</div>
+  <nav>
+    <a href="https://github.com/Thepikde/cartomap" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.npmjs.com/package/cartomap" target="_blank" rel="noopener">npm</a>
+    <a href="https://www.paypal.com/donate/?hosted_button_id=5WWSBNR6GSWYA" target="_blank" rel="noopener" data-i18n="footer.donate">Spende ☕</a>
+    <a href="https://github.com/Thepikde/cartomap/blob/main/LICENSE" target="_blank" rel="noopener" data-i18n="footer.license">Lizenz</a>
+  </nav>
+</div></footer>
+
+<script>
+/* ===== i18n: Deutsch (Standard) + Englisch ============================ */
+const I18N = {
+  de: {
+    "nav.why":"Warum","nav.how":"Funktionsweise",
+    "hero.kicker":"Open Source · MIT-Lizenz",
+    "hero.h1":"Eine <em>lebende</em> Karte deiner&nbsp;Codebase.",
+    "hero.lead":"Cartomap führt eine stets aktuelle, git-versionierte Karte deines Projekts — Routen, Datenmodelle, Hubs, Abhängigkeiten — damit deine KI das <span class=\"sea\">Terrain</span> kennt, statt zu raten und Tokens zu verbrennen.",
+    "hero.cta1":"Repo kartieren","hero.cta2":"Auf npm ansehen ↗",
+    "hero.pill1":"<b>~2–4k</b> Token-Karte","hero.pill2":"statt <b>100k+</b> Roh-Dateien","hero.pill3":"<b>0</b> Abhängigkeiten",
+    "hero.termNote":"# Deine KI liest jetzt zuerst das Terrain.",
+    "why.kicker":"Das Problem",
+    "why.h2":"Große Codebases lassen KI-Assistenten <em>raten.</em>",
+    "why.lead":"Sie halluzinieren APIs und übersehen übergreifende Zusammenhänge, weil sie immer nur ein paar Dateien sehen. Cartomap gibt ihnen — und neuen Teammitgliedern — das ganze Terrain in wenigen tausend Tokens.",
+    "why.c1h":"Eine Quelle der Wahrheit","why.c1p":"Routen, Modelle, Hubs und verwaiste Module in einer lesbaren Karte — die Vogelperspektive, die deine KI nie hatte.",
+    "why.c2h":"Wird nie veraltet","why.c2p":"Ein Pre-Commit-Hook vermisst die Karte bei jedem Commit neu und staged sie. Immer aktuell — und blockiert nie deinen Commit.",
+    "why.c3h":"Passt sich deinem Stack an","why.c3p":"Erkennt Sprache, Framework, Quell-Roots und Pfad-Aliase automatisch — und wählt den passenden Analyzer für dein Projekt.",
+    "why.s1":"Tokens pro Karte","why.s2":"Tokens an Dateien gespart","why.s3":"Sprachen kartiert","why.s4":"um 32 Dateien zu vermessen",
+    "start.kicker":"Schnellstart","start.h2":"Zwei Wege hinein — beide erstklassig.",
+    "start.lead":"Starte am ersten Tag und das Gedächtnis wächst organisch mit deinem Projekt. Oder setze es auf ein bestehendes Repo — es erfasst das aktuelle Terrain sofort.",
+    "start.glabel":"Neues Projekt · perfekt ab Tag eins","start.gh":"Greenfield","start.gp":"Ordner + Git + Cartomap anlegen, dann normal entwickeln. Die Karte wächst mit jedem Commit.",
+    "start.elabel":"Bestehendes Projekt · sofortige Momentaufnahme","start.eh":"Bestehendes Repo","start.ep":"Erkennt deinen Stack &amp; deine Pfade und vermisst beim ersten Lauf die komplette Karte.",
+    "start.ilabel":"Global installieren","start.inote":"…oder ohne Installation ausführen — <span style=\"color:var(--paper-2)\">npx cartomap init</span>",
+    "div.detail":"KARTENDETAIL","div.sound":"PEILUNGEN","div.upkeep":"PFLEGE",
+    "get.kicker":"Was du bekommst","get.h2":"Ein Ordner, den deine KI zuerst liest.",
+    "get.note":"Die Karte ist standardmäßig englisch (echte CLI-Ausgabe) — mit <span style=\"color:var(--paper-2)\">\"lang\":\"de\"</span> gibt das Tool auch deutsch aus.",
+    "how.kicker":"Wie es sich deinem Projekt anpasst","how.h2":"Zwei Vermessungstiefen. Keine Konfiguration nötig.",
+    "how.deepLabel":"Tiefes Wasser · volle Peilung","how.deepP":"Echte TS-Compiler-Analyse — aufgelöste Imports &amp; Exports, Client-/Server-Komponenten, ORM-Modelle und Routen:",
+    "how.deep1":"Next.js App- <span style=\"color:var(--paper-2)\">und</span> Pages-Router","how.deep2":"NestJS-Controller, Express / Fastify / Koa","how.deep3":"Prisma- &amp; Drizzle-Modelle","how.deep4":"tsconfig- / jsconfig-Pfad-Aliase",
+    "how.shLabel":"Flachwasser · strukturelle Vermessung","how.shH":"Alles andere","how.shP":"Ein Datei-Graph plus Import-Heuristiken und ein Doku-Scan — nie ein Absturz, immer eine nützliche Karte:",
+    "how.sh3":"Sinnvolle Defaults bei leeren oder unbekannten Stacks",
+    "how.note":"Konfigurierbar über <span style=\"color:var(--paper-2)\">cartomap.config.json</span> — Roots, Aliase, beobachtete „kritische\" Pfade, Ausgabeordner. Standard Englisch; mit <span style=\"color:var(--paper-2)\">\"lang\":\"de\"</span> auf Deutsch.",
+    "up.kicker":"Auto-Update","up.h2":"Es vermisst sich selbst neu.",
+    "up.c1h":"Bei jedem Commit","up.c1p":"Ein Pre-Commit-Hook baut die Karte neu und staged sie — sie veraltet nie und blockiert nie deinen Commit.",
+    "up.c2h":"Husky-freundlich","up.c2p":"Nutzt du schon Husky, lefthook oder einen eigenen Hook? Cartomap klinkt sich in dein bestehendes <code>pre-commit</code> ein, statt es zu ersetzen.",
+    "up.c3h":"Team-bereit","up.c3p":"Der Hook ist im Repo eingecheckt. Teammitglieder führen einmal pro Checkout <code>cartomap install-hook</code> aus.",
+    "plugin.kicker":"Claude-Code-Plugin","plugin.h2":"Ein Befehl und deine KI liest zuerst die Karte.",
+    "plugin.lead":"Cartomap bringt ein Claude-Code-Plugin mit — zwei Slash-Befehle plus ein Skill, der jede KI-Session in einem Cartomap-Projekt zuerst die Karte lesen lässt.",
+    "band.you":"✦ DU BIST HIER ✦","band.h2":"Gib deiner KI eine&nbsp;<em>Karte.</em>","band.lead":"Kostenlos, Open Source, offline — null Laufzeit-Abhängigkeiten.","band.cta2":"Auf GitHub favorisieren ↗",
+    "nav.impact":"Impact","nav.donate":"Spende ☕","div.impact":"AUSWIRKUNG",
+    "impact.kicker":"Impact-Analyse","impact.h2":"Was geht kaputt, wenn du das <em>anfasst?</em>","impact.lead":"Frag Cartomap nach dem Einschlagradius einer Änderung: welche Dateien — direkt und transitiv — von einer Datei abhängen, bevor du sie umbaust.","impact.l1":"Direkte <span style=\"color:var(--paper-2)\">und</span> transitive Importeure","impact.l2":"Aus dem Graphen, den du schon hast — <code>--json</code> fürs Tooling","impact.l3":"Ehrliche Untergrenze: nur statische Imports",
+    "donate.text":"Cartomap ist und bleibt kostenlos. Dankbar? <a href=\"https://www.paypal.com/donate/?hosted_button_id=5WWSBNR6GSWYA\" target=\"_blank\" rel=\"noopener\">Spendier mir einen Kaffee ☕</a>","footer.donate":"Spende ☕",
+    "footer.license":"Lizenz","copy":"Kopieren"
+  },
+  en: {
+    "nav.why":"Why","nav.how":"How it works",
+    "hero.kicker":"Open source · MIT license",
+    "hero.h1":"A <em>living</em> map of&nbsp;your codebase.",
+    "hero.lead":"Cartomap keeps an always-current, git-tracked chart of your project — routes, data models, hubs, dependencies — so your AI assistant knows the <span class=\"sea\">territory</span> instead of guessing and burning tokens.",
+    "hero.cta1":"Chart your repo","hero.cta2":"View on npm ↗",
+    "hero.pill1":"<b>~2–4k</b> token map","hero.pill2":"vs <b>100k+</b> raw files","hero.pill3":"<b>0</b> dependencies",
+    "hero.termNote":"# Your AI now reads the territory first.",
+    "why.kicker":"The problem",
+    "why.h2":"Big codebases make AI assistants <em>guess.</em>",
+    "why.lead":"They hallucinate APIs and miss cross-cutting concerns because they only ever see a few files at a time. Cartomap hands them — and new teammates — the whole terrain in a few thousand tokens.",
+    "why.c1h":"One source of truth","why.c1p":"Routes, models, hubs and orphaned modules in a single readable map — the bird's-eye view your AI never had.",
+    "why.c2h":"Never goes stale","why.c2p":"A pre-commit hook re-surveys and stages the map on every commit. Always current — and it never blocks your commit.",
+    "why.c3h":"Adapts to your stack","why.c3p":"Auto-detects language, framework, source roots and path aliases — then picks the right analyzer for your project.",
+    "why.s1":"tokens per map","why.s2":"tokens of files avoided","why.s3":"languages charted","why.s4":"to survey 32 files",
+    "start.kicker":"Quickstart","start.h2":"Two ways in — both first-class.",
+    "start.lead":"Start it on day one and the memory grows organically with your project. Or drop it onto an existing repo and it captures the current terrain instantly.",
+    "start.glabel":"New project · perfect from day one","start.gh":"Greenfield","start.gp":"Scaffold folder + git + Cartomap, then build as usual. The map grows with every commit.",
+    "start.elabel":"Existing project · instant snapshot","start.eh":"Existing repo","start.ep":"Detects your stack &amp; paths and surveys the full map on the first run.",
+    "start.ilabel":"Install globally","start.inote":"…or run without installing — <span style=\"color:var(--paper-2)\">npx cartomap init</span>",
+    "div.detail":"CHART DETAIL","div.sound":"SOUNDINGS","div.upkeep":"UPKEEP",
+    "get.kicker":"What you get","get.h2":"A folder your AI reads first.",
+    "get.note":"The map is English by default (real CLI output) — set <span style=\"color:var(--paper-2)\">\"lang\":\"de\"</span> and the tool emits German too.",
+    "how.kicker":"How it adapts to your project","how.h2":"Two depths of survey. Zero config required.",
+    "how.deepLabel":"Deep water · full sounding","how.deepP":"Real TS-compiler analysis — resolved imports &amp; exports, client/server components, ORM models, and routes:",
+    "how.deep1":"Next.js App <span style=\"color:var(--paper-2)\">and</span> Pages Router","how.deep2":"NestJS controllers, Express / Fastify / Koa","how.deep3":"Prisma &amp; Drizzle models","how.deep4":"tsconfig / jsconfig path aliases",
+    "how.shLabel":"Shallows · structural survey","how.shH":"Everything else","how.shP":"A file graph plus import heuristics and a docs scan — never a crash, always a useful chart:",
+    "how.sh3":"Sensible defaults on empty or unknown stacks",
+    "how.note":"Config-driven via <span style=\"color:var(--paper-2)\">cartomap.config.json</span> — roots, aliases, watched “critical” paths, output dir. English by default; set <span style=\"color:var(--paper-2)\">\"lang\":\"de\"</span> for German.",
+    "up.kicker":"Auto-update","up.h2":"It re-surveys itself.",
+    "up.c1h":"On every commit","up.c1p":"A pre-commit hook rebuilds the map and stages it — so it never goes stale, and never blocks your commit.",
+    "up.c2h":"Husky-friendly","up.c2p":"Already use Husky, lefthook, or a custom hook? Cartomap chains into your existing <code>pre-commit</code> instead of replacing it.",
+    "up.c3h":"Team-ready","up.c3p":"The hook is committed into the repo. Teammates just run <code>cartomap install-hook</code> once per checkout.",
+    "plugin.kicker":"Claude Code plugin","plugin.h2":"One command and your AI reads the map first.",
+    "plugin.lead":"Cartomap ships a Claude Code plugin — two slash commands plus a skill that makes any AI session read the chart first when working in a Cartomap project.",
+    "band.you":"✦ YOU ARE HERE ✦","band.h2":"Give your AI a&nbsp;<em>map.</em>","band.lead":"Free, open source, offline — zero runtime dependencies.","band.cta2":"Star on GitHub ↗",
+    "nav.impact":"Impact","nav.donate":"Donate ☕","div.impact":"BLAST RADIUS",
+    "impact.kicker":"Impact analysis","impact.h2":"What breaks if you <em>touch this?</em>","impact.lead":"Ask Cartomap for the blast radius of a change: which files — directly and transitively — depend on a file, before you refactor it.","impact.l1":"Direct <span style=\"color:var(--paper-2)\">and</span> transitive importers","impact.l2":"From the graph you already have — <code>--json</code> for tooling","impact.l3":"Honest lower bound: static imports only",
+    "donate.text":"Cartomap is free, and stays free. Grateful? <a href=\"https://www.paypal.com/donate/?hosted_button_id=5WWSBNR6GSWYA\" target=\"_blank\" rel=\"noopener\">Buy me a coffee ☕</a>","footer.donate":"Donate ☕",
+    "footer.license":"License","copy":"Copy"
+  }
+};
+
+function setLang(lang){
+  if(!I18N[lang]) lang = "de";
+  document.documentElement.lang = lang;
+  const dict = I18N[lang];
+  document.querySelectorAll("[data-i18n]").forEach((el)=>{
+    const v = dict[el.dataset.i18n];
+    if(v != null) el.innerHTML = v;
+  });
+  document.querySelectorAll(".lang button").forEach((b)=> b.classList.toggle("on", b.dataset.lang === lang));
+  document.querySelectorAll(".copy").forEach((b)=>{ if(!b.classList.contains("done")) b.textContent = dict["copy"]; });
+  try{ localStorage.setItem("cartomap-lang", lang); }catch{}
+}
+document.querySelectorAll(".lang button").forEach((b)=> b.addEventListener("click", ()=> setLang(b.dataset.lang)));
+(function(){ let s="de"; try{ s = localStorage.getItem("cartomap-lang") || "de"; }catch{} setLang(s); })();
+
+/* ===== Topografie: Maus-Parallax (nur Desktop, ohne reduced-motion) ===== */
+(function(){
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const a = document.querySelector(".layer-a"), b = document.querySelector(".layer-b"), c = document.querySelector(".layer-c");
+  if(reduce || !fine || !a) return;
+  let tx=0,ty=0,cx=0,cy=0,raf=null;
+  addEventListener("pointermove",(e)=>{
+    tx=(e.clientX/innerWidth-.5); ty=(e.clientY/innerHeight-.5);
+    if(!raf) raf=requestAnimationFrame(loop);
+  },{passive:true});
+  function loop(){
+    cx+=(tx-cx)*.06; cy+=(ty-cy)*.06;
+    a.style.transform=`translate(${cx*26}px,${cy*20}px)`;
+    b.style.transform=`translate(${cx*-20}px,${cy*-14}px)`;
+    c.style.transform=`translate(${cx*12}px,${cy*8}px)`;
+    if(Math.abs(tx-cx)>.001||Math.abs(ty-cy)>.001){raf=requestAnimationFrame(loop)}else{raf=null}
+  }
+})();
+
+/* ===== Hero-Terminal: Tippeffekt + gestaffelte Ausgabe ================= */
+(function(){
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const el = document.getElementById("type"), cur = document.getElementById("cur");
+  const outs = [...document.querySelectorAll(".term .out")];
+  const text = "npx cartomap init";
+  if(reduce){ el.textContent = text; outs.forEach(o=>o.classList.add("show")); if(cur) cur.style.display="none"; return; }
+  let i=0;
+  function tick(){
+    if(i<=text.length){ el.textContent = text.slice(0,i++); setTimeout(tick, 52 + Math.random()*46); }
+    else { reveal(); }
+  }
+  function reveal(){
+    outs.forEach((o,n)=> setTimeout(()=>o.classList.add("show"), 260*n + 200));
+    setTimeout(()=>{ if(cur) cur.style.opacity="0"; }, 260*outs.length + 600);
+  }
+  setTimeout(tick, 650);
+})();
+
+/* ===== Scroll-Reveals ================================================== */
+(function(){
+  const els = document.querySelectorAll(".reveal");
+  if(!("IntersectionObserver" in window)){ els.forEach(e=>e.classList.add("in")); return; }
+  const io = new IntersectionObserver((ents)=>{
+    ents.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } });
+  },{rootMargin:"0px 0px -8% 0px",threshold:.12});
+  els.forEach(e=>io.observe(e));
+})();
+
+/* ===== Zahlen hochzählen, sobald sichtbar ============================= */
+(function(){
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const nums = document.querySelectorAll("[data-count]");
+  function run(node){
+    const target = +node.dataset.count;
+    if(reduce){ node.textContent = target; return; }
+    const dur = 1100, t0 = performance.now();
+    function step(now){
+      const p = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-p,3);
+      node.textContent = Math.round(target*e);
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  const box = document.getElementById("stats");
+  if(!box) return;
+  if(!("IntersectionObserver" in window)){ nums.forEach(run); return; }
+  const io = new IntersectionObserver((ents)=>{
+    ents.forEach(en=>{ if(en.isIntersecting){ nums.forEach(run); io.disconnect(); } });
+  },{threshold:.4});
+  io.observe(box);
+})();
+
+/* ===== Copy-to-Clipboard ============================================== */
+document.querySelectorAll(".copy").forEach((btn)=>{
+  btn.addEventListener("click", async ()=>{
+    try{
+      await navigator.clipboard.writeText(btn.dataset.copy);
+      const lang = document.documentElement.lang || "de";
+      btn.textContent = (lang==="de" ? "Kopiert ✓" : "Copied ✓"); btn.classList.add("done");
+      setTimeout(()=>{ btn.classList.remove("done"); btn.textContent = I18N[lang] ? I18N[lang]["copy"] : "Copy"; }, 1400);
+    }catch{/* Clipboard nicht verfügbar — Befehl bleibt markierbar */}
+  });
+});
+</script>
+</body>
+</html>
