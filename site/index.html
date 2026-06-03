@@ -17,11 +17,10 @@
 <meta name="twitter:title" content="Cartomap — eine lebende Karte deiner Codebase">
 <meta name="twitter:description" content="Eine stets aktuelle, git-versionierte Karte deiner Codebase, damit KI-Assistenten sofort das Terrain kennen.">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link rel="canonical" href="https://cartomap.thepik.de/">
+<link rel="preload" href="fonts/satoshi-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/clash-display-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jetbrains-mono-400.woff2" as="font" type="font/woff2" crossorigin>
 
 <style>
 /* ====================================================================
@@ -36,13 +35,21 @@
   --panel-solid:#0f1612;
   --line:rgba(126,176,150,.16);
   --line-2:rgba(126,176,150,.30);
-  --paper:#ece6d6; --paper-2:#cdd2c5; --dim:#8c968a; --faint:#5d685c;
+  --paper:#ece6d6; --paper-2:#cdd2c5; --dim:#8c968a; --faint:#7e8b7d;
   --accent:#ff6a3d; --accent-deep:#e0532a; --sea:#5ec4a8; --brass:#c9a85e;
   --r:16px; --maxw:1140px;
   --display:"Clash Display","Satoshi",system-ui,sans-serif;
   --body:"Satoshi",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
+
+/* --- Selbst-gehostete Fonts (kein Third-Party, preloadbar) ------------- */
+@font-face{font-family:"Clash Display";src:url("fonts/clash-display-600.woff2") format("woff2");font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:"Satoshi";src:url("fonts/satoshi-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Satoshi";src:url("fonts/satoshi-500.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Satoshi";src:url("fonts/satoshi-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"JetBrains Mono";src:url("fonts/jetbrains-mono-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"JetBrains Mono";src:url("fonts/jetbrains-mono-500.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -106,6 +113,12 @@ header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px) saturate(
 .nav-links .ghbtn{color:var(--paper)}
 .nav-links a.donate-nav{color:var(--accent)}
 .nav-links a.donate-nav:hover{color:#ff8a63}
+.nav-toggle{display:none;width:44px;height:44px;margin-right:-6px;border:0;background:transparent;cursor:pointer;flex-direction:column;justify-content:center;align-items:center;gap:5px;border-radius:9px}
+.nav-toggle span{width:22px;height:2px;background:var(--dim);border-radius:2px;transition:transform .25s ease,opacity .2s ease,background .2s}
+.nav-toggle:hover span{background:var(--paper)}
+header.nav.open .nav-toggle span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+header.nav.open .nav-toggle span:nth-child(2){opacity:0}
+header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
 /* --- Sprach-Umschalter (DE/EN) ---------------------------------------- */
 .lang{display:inline-flex;border:1px solid var(--line-2);border-radius:9px;overflow:hidden}
@@ -229,9 +242,36 @@ footer{border-top:1px solid var(--line);padding:3rem 0;color:var(--faint);font-f
   .g3,.g2{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(2,1fr)}
 }
+/* --- Mobile-Menü (Hamburger) -------------------------------------- */
+@media(max-width:820px){
+  .nav-toggle{display:flex}
+  .nav-links{
+    position:absolute;top:100%;left:0;right:0;
+    flex-direction:column;align-items:stretch;gap:0;
+    padding:.3rem 1.5rem 1.15rem;
+    background:linear-gradient(180deg,rgba(9,13,11,.99),rgba(9,13,11,.97));
+    backdrop-filter:blur(16px) saturate(120%);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 28px 44px -26px rgba(0,0,0,.85);
+    opacity:0;visibility:hidden;transform:translateY(-10px);
+    transition:opacity .22s ease,transform .22s ease,visibility .22s;
+  }
+  header.nav.open .nav-links{opacity:1;visibility:visible;transform:none}
+  .nav-links a{display:flex;align-items:center;min-height:48px;padding:.4rem .2rem;font-size:.96rem;color:var(--paper);border-bottom:1px solid var(--line)}
+  .nav-links a.donate-nav{color:var(--accent)}
+  .nav-links .lang{align-self:flex-start;margin:.9rem .2rem .2rem}
+  .nav-links .lang button{min-height:44px;padding:.5rem .95rem;font-size:.8rem}
+}
 @media(max-width:640px){
-  .nav-links a:not(.ghbtn){display:none}
   section{padding:4.5rem 0}
+  .wrap{padding:0 1.2rem}
+  .nav-in{padding:0 1.2rem}
+  .hero h1{font-size:clamp(2.05rem,8vw,2.9rem)}
+  .coord.tr{display:none}
+  .band{padding:3rem 1.2rem}
+  .foot-in{flex-direction:column;align-items:flex-start;gap:1rem}
+  .foot-in nav a{margin-left:0;margin-right:1.3rem}
+  .copy{min-height:40px}
 }
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
@@ -277,7 +317,7 @@ footer{border-top:1px solid var(--line);padding:3rem 0;color:var(--faint);font-f
       </svg>
       Cartomap
     </a>
-    <nav class="nav-links">
+    <nav class="nav-links" id="nav-menu">
       <a href="#why" data-i18n="nav.why">Warum</a>
       <a href="#start">Start</a>
       <a href="#impact" data-i18n="nav.impact">Impact</a>
@@ -290,6 +330,7 @@ footer{border-top:1px solid var(--line);padding:3rem 0;color:var(--faint);font-f
       </div>
       <a class="ghbtn" href="https://github.com/Thepikde/cartomap" target="_blank" rel="noopener">GitHub ↗</a>
     </nav>
+    <button class="nav-toggle" type="button" aria-label="Menü" aria-expanded="false" aria-controls="nav-menu"><span></span><span></span><span></span></button>
   </div>
 </header>
 
@@ -698,6 +739,22 @@ function setLang(lang){
 }
 document.querySelectorAll(".lang button").forEach((b)=> b.addEventListener("click", ()=> setLang(b.dataset.lang)));
 (function(){ let s="de"; try{ s = localStorage.getItem("cartomap-lang") || "de"; }catch{} setLang(s); })();
+
+/* ===== Mobile-Menü (Hamburger) ======================================== */
+(function(){
+  const nav = document.querySelector("header.nav");
+  const toggle = document.querySelector(".nav-toggle");
+  if(!nav || !toggle) return;
+  const close = ()=>{ nav.classList.remove("open"); toggle.setAttribute("aria-expanded","false"); };
+  toggle.addEventListener("click", ()=>{
+    const open = nav.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  // Schließen bei Klick auf einen Menü-Link, bei Escape und beim Wechsel auf Desktop-Breite
+  nav.querySelectorAll(".nav-links a").forEach((a)=> a.addEventListener("click", close));
+  document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") close(); });
+  matchMedia("(min-width: 821px)").addEventListener("change", (e)=>{ if(e.matches) close(); });
+})();
 
 /* ===== Topografie: Maus-Parallax (nur Desktop, ohne reduced-motion) ===== */
 (function(){
