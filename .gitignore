@@ -1,0 +1,12 @@
+# Dependencies (Cartograph selbst hat keine, aber Tests/Beispiele könnten welche haben)
+node_modules/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Lokale Test-Spielwiese (Dogfooding-Ordner)
+/tmp-*/
+/sandbox/

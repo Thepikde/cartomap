@@ -1,0 +1,35 @@
+{
+  "name": "cartograph",
+  "version": "0.1.0",
+  "description": "A living project memory for AI coding — an always-current, git-tracked map of your codebase so AI assistants (and humans) instantly know what's what.",
+  "type": "module",
+  "bin": {
+    "cartograph": "bin/cartograph.mjs"
+  },
+  "scripts": {
+    "cartograph": "node bin/cartograph.mjs",
+    "selftest": "node bin/cartograph.mjs build"
+  },
+  "keywords": [
+    "ai",
+    "codebase",
+    "knowledge-graph",
+    "architecture",
+    "documentation",
+    "claude-code",
+    "cursor",
+    "context",
+    "memory"
+  ],
+  "author": "Nderim Selmanaj",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "hooks",
+    "templates"
+  ]
+}

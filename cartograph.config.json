@@ -1,0 +1,17 @@
+{
+  "name": "cartograph",
+  "language": "javascript",
+  "framework": "none",
+  "adapter": "typescript",
+  "orm": "none",
+  "roots": [
+    "lib",
+    "bin"
+  ],
+  "aliases": {},
+  "watch": [],
+  "docs": [
+    "README.md"
+  ],
+  "out": ".cartograph"
+}

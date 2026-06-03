@@ -1,0 +1,243 @@
+{
+  "name": "cartograph",
+  "generatedBy": "cartograph",
+  "stats": {
+    "files": 12,
+    "pages": 0,
+    "apiRoutes": 0,
+    "components": 0,
+    "libModules": 11,
+    "models": 0,
+    "clientComponents": 0
+  },
+  "models": [],
+  "modelUsage": {},
+  "pages": [],
+  "apiRoutes": [],
+  "hubs": [
+    {
+      "file": "lib/adapter-generic.mjs",
+      "inDegree": 2
+    },
+    {
+      "file": "lib/build.mjs",
+      "inDegree": 2
+    },
+    {
+      "file": "lib/config.mjs",
+      "inDegree": 2
+    },
+    {
+      "file": "lib/hook.mjs",
+      "inDegree": 2
+    },
+    {
+      "file": "lib/adapter-typescript.mjs",
+      "inDegree": 1
+    },
+    {
+      "file": "lib/detect.mjs",
+      "inDegree": 1
+    },
+    {
+      "file": "lib/gitsync.mjs",
+      "inDegree": 1
+    },
+    {
+      "file": "lib/graph.mjs",
+      "inDegree": 1
+    },
+    {
+      "file": "lib/init.mjs",
+      "inDegree": 1
+    },
+    {
+      "file": "lib/render.mjs",
+      "inDegree": 1
+    },
+    {
+      "file": "lib/walk.mjs",
+      "inDegree": 1
+    }
+  ],
+  "orphans": [
+    "bin/cartograph.mjs"
+  ],
+  "topExternals": [
+    {
+      "name": "node:path",
+      "count": 9
+    },
+    {
+      "name": "node:fs",
+      "count": 8
+    },
+    {
+      "name": "node:child_process",
+      "count": 4
+    },
+    {
+      "name": "node:module",
+      "count": 1
+    },
+    {
+      "name": "node:url",
+      "count": 1
+    }
+  ],
+  "byExt": {
+    ".mjs": 12
+  },
+  "usedTs": false,
+  "files": {
+    "bin/cartograph.mjs": {
+      "kind": "source",
+      "imports": [
+        "lib/build.mjs",
+        "lib/hook.mjs",
+        "lib/init.mjs"
+      ],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/adapter-generic.mjs": {
+      "kind": "lib",
+      "imports": [],
+      "externals": [
+        "node:fs",
+        "node:path"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/adapter-typescript.mjs": {
+      "kind": "lib",
+      "imports": [
+        "lib/adapter-generic.mjs"
+      ],
+      "externals": [
+        "node:fs",
+        "node:module",
+        "node:path"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/build.mjs": {
+      "kind": "lib",
+      "imports": [
+        "lib/adapter-generic.mjs",
+        "lib/adapter-typescript.mjs",
+        "lib/config.mjs",
+        "lib/gitsync.mjs",
+        "lib/graph.mjs",
+        "lib/render.mjs",
+        "lib/walk.mjs"
+      ],
+      "externals": [
+        "node:child_process",
+        "node:fs",
+        "node:path"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/config.mjs": {
+      "kind": "lib",
+      "imports": [
+        "lib/detect.mjs"
+      ],
+      "externals": [
+        "node:fs",
+        "node:path"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/detect.mjs": {
+      "kind": "lib",
+      "imports": [],
+      "externals": [
+        "node:fs",
+        "node:path"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/gitsync.mjs": {
+      "kind": "lib",
+      "imports": [],
+      "externals": [
+        "node:child_process"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/graph.mjs": {
+      "kind": "lib",
+      "imports": [],
+      "externals": [
+        "node:path"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/hook.mjs": {
+      "kind": "lib",
+      "imports": [],
+      "externals": [
+        "node:child_process",
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/init.mjs": {
+      "kind": "lib",
+      "imports": [
+        "lib/build.mjs",
+        "lib/config.mjs",
+        "lib/hook.mjs"
+      ],
+      "externals": [
+        "node:child_process",
+        "node:fs",
+        "node:path"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/render.mjs": {
+      "kind": "lib",
+      "imports": [],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "lib/walk.mjs": {
+      "kind": "lib",
+      "imports": [],
+      "externals": [
+        "node:fs",
+        "node:path"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    }
+  }
+}
