@@ -24,6 +24,14 @@
   ],
   "author": "Nderim Selmanaj",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Thepikde/cartograph.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Thepikde/cartograph/issues"
+  },
+  "homepage": "https://github.com/Thepikde/cartograph#readme",
   "engines": {
     "node": ">=18"
   },

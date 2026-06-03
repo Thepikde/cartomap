@@ -98,7 +98,19 @@ git clone https://github.com/Thepikde/cartograph
 cd cartograph && npm link    # makes `cartograph` available globally
 ```
 
-_(An npm package and a Claude Code plugin are on the roadmap.)_
+_(An npm package is on the roadmap.)_
+
+## Claude Code plugin
+
+Cartograph ships a [Claude Code](https://claude.com/claude-code) plugin — two slash commands plus a
+**skill** that makes any AI session read the map first when working in a Cartograph project:
+
+```
+/plugin marketplace add Thepikde/cartograph
+/plugin install cartograph@cartograph
+```
+
+Then use **`/cartograph:init`** (set up the map) and **`/cartograph:update`** (rebuild it).
 
 ## Requirements
 
@@ -108,7 +120,6 @@ available in your project (most TS projects already do).
 ## Roadmap
 
 - npm package (`npx cartograph …`)
-- Claude Code plugin (slash commands + skill)
 - More language heuristics, interactive `graph.html`, MCP server for live graph queries
 
 ## License

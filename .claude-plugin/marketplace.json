@@ -1,0 +1,14 @@
+{
+  "name": "cartograph",
+  "owner": {
+    "name": "Nderim Selmanaj",
+    "url": "https://github.com/Thepikde"
+  },
+  "plugins": [
+    {
+      "name": "cartograph",
+      "source": "./",
+      "description": "A living, always-current map of your codebase for AI coding. Adds /cartograph:init and /cartograph:update commands plus a skill that tells the AI to read the project map first."
+    }
+  ]
+}
