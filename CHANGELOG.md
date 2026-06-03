@@ -2,6 +2,16 @@
 
 All notable changes to Cartomap are documented here. Versions follow [SemVer](https://semver.org).
 
+## 0.4.1
+### Fixed
+- **Plugin/package version drift** — `.claude-plugin/plugin.json` was stuck at `0.3.1`; it now
+  tracks `package.json`, enforced by a new consistency test.
+- **`ignore` matching is now path-segment aware** — a user pattern like `"test"` no longer also
+  filters `src/contest/…` (was a naive substring). Path fragments (`lib/generated`) and dotted
+  filename fragments (`.test.`) still match.
+### Changed
+- Author/owner name unified to **ThePik** across `package.json`, `plugin.json` and `marketplace.json`.
+
 ## 0.4.0
 ### Added
 - **`cartomap affected <file>`** — show which files (transitively) import a file: the *blast radius*

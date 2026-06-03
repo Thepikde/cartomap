@@ -9,6 +9,8 @@ import { build } from "../lib/build.mjs";
 import { buildGraph } from "../lib/graph.mjs";
 import { reverseDeps, dependentsOf, computeAffected, resolveFileKey } from "../lib/affected.mjs";
 import { detectEntryPoints } from "../lib/entrypoints.mjs";
+import { matchesIgnore } from "../lib/scan.mjs";
+import { readFileSync } from "node:fs";
 
 const FIX = join(dirname(fileURLToPath(import.meta.url)), "fixtures");
 const run = (name) => build(join(FIX, name), { silent: true });
@@ -103,4 +105,20 @@ test("entry points: convention (python) + framework (next) + bin", async () => {
   // synthetisch: konventionelle CLI-Datei unter bin/ wird erkannt
   const eps = detectEntryPoints({ repoRoot: "/x", config: { roots: ["bin"], framework: "none" }, files: { "bin/cli.mjs": {} } });
   assert.ok(eps.some((e) => e.file === "bin/cli.mjs"), "bin/cli.mjs detected");
+});
+
+test("version consistency: package.json === .claude-plugin/plugin.json", () => {
+  const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+  const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+  const plugin = JSON.parse(readFileSync(join(root, ".claude-plugin", "plugin.json"), "utf8"));
+  assert.equal(plugin.version, pkg.version, "plugin.json version must match package.json");
+});
+
+test("ignore matching is path-segment aware (no 'test' → 'contest')", () => {
+  assert.equal(matchesIgnore("src/test/x.ts", "test"), true, "matches the 'test' segment");
+  assert.equal(matchesIgnore("test/x.ts", "test"), true, "matches leading 'test' segment");
+  assert.equal(matchesIgnore("src/contest/x.ts", "test"), false, "does NOT match 'contest'");
+  assert.equal(matchesIgnore("src/lib/generated/x.ts", "lib/generated"), true, "path fragment matches");
+  assert.equal(matchesIgnore("src/a.test.ts", ".test."), true, "dotted filename fragment still matches");
+  assert.equal(matchesIgnore("src/atestb.ts", "lib"), false, "unrelated pattern doesn't match");
 });
