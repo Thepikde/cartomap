@@ -49,7 +49,7 @@ automatically, on every commit.
 
 ```
 .cartomap/
-  ARCHITECTURE.md   # the map: routes, data models, hubs, orphaned modules, top deps
+  ARCHITECTURE.md   # the map: entry points, routes, data models, hubs (+ blast radius), orphans, deps
   graph.json        # machine-readable graph
   memory/
     INDEX.md        # decisions, open points, project knowledge (hand-maintained)
@@ -66,6 +66,12 @@ Cartomap auto-detects language, framework, source roots and path aliases, then p
   **routes** (Next.js App **and** Pages Router, NestJS controllers, Express/Fastify/Koa),
   Prisma/Drizzle models, client/server components. `typescript` is loaded from your project if
   present; otherwise a lighter regex pass is used (still works).
+
+Ask **what a change affects** at any time:
+
+```bash
+cartomap affected src/lib/auth.ts   # the files that (transitively) import it — the blast radius
+```
 - **Everything else → broad structural analysis**: file graph + import heuristics for Python, Go,
   Rust, PHP, Ruby, Java/Kotlin, C/C++, C# + a docs scan.
 
@@ -90,6 +96,7 @@ hooks keep working.
 cartomap init [--no-hook]          Set up in the current project (empty or existing)
 cartomap new <name>                Create a new project with Cartomap from day one
 cartomap build [--quiet] [--verbose]   (Re)build the map (--verbose lists files that failed to parse)
+cartomap affected <file>           What depends on a file — the blast radius of a change (--json)
 cartomap install-hook              Enable auto-update on every commit
 cartomap help
 ```
@@ -130,6 +137,13 @@ available in your project (most TS projects already do).
 ## Roadmap
 
 - More language heuristics, interactive `graph.html`, MCP server for live graph queries
+
+## Security
+
+Cartomap runs **entirely offline** with **zero runtime dependencies** — no network calls, no
+telemetry. It reads only the source under your configured `roots` (plus manifests), never executes
+your app code, and writes only to `.cartomap/`. See [`SECURITY.md`](SECURITY.md) for the full
+posture and how to report a vulnerability.
 
 ## License
 

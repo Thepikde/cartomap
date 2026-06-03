@@ -2,6 +2,19 @@
 
 All notable changes to Cartomap are documented here. Versions follow [SemVer](https://semver.org).
 
+## 0.4.0
+### Added
+- **`cartomap affected <file>`** — show which files (transitively) import a file: the *blast radius*
+  of a change ("what breaks if I touch this?"). Static-import based and reported as an honest lower
+  bound; `--json` for tooling.
+- **"Start here" entry points** in the map — derived from `package.json` `bin`/`main`, framework
+  roots (Next.js) and conventional `index`/`main`/`app` files — so AI assistants know where to begin reading.
+- **Impact hint on hubs** — each hub now shows how many files are transitively affected if it changes.
+- **`SECURITY.md`** + a Security section in the README documenting the offline, deterministic,
+  zero-dependency, read-only posture.
+### Changed
+- `graph.json` `schemaVersion` bumped to **2** (adds `entryPoints` and `hubs[].affected`).
+
 ## 0.3.0
 ### Added
 - **Route extraction beyond Next.js App Router:**
