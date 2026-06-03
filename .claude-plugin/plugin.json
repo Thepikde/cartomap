@@ -1,12 +1,12 @@
 {
-  "name": "cartograph",
+  "name": "cartomap",
   "version": "0.3.0",
-  "description": "A living, always-current map of your codebase for AI coding. Generates an AI-readable .cartograph/ map (routes, data models, hubs) and keeps it in sync on every commit.",
+  "description": "A living, always-current map of your codebase for AI coding. Generates an AI-readable .cartomap/ map (routes, data models, hubs) and keeps it in sync on every commit.",
   "author": {
     "name": "Nderim Selmanaj"
   },
-  "homepage": "https://github.com/Thepikde/cartograph",
-  "repository": "https://github.com/Thepikde/cartograph",
+  "homepage": "https://github.com/Thepikde/cartomap",
+  "repository": "https://github.com/Thepikde/cartomap",
   "license": "MIT",
   "keywords": ["codebase", "architecture", "context", "knowledge-graph", "memory"]
 }

@@ -1,0 +1,99 @@
+{
+  "name": "next-app",
+  "generatedBy": "cartograph",
+  "stats": {
+    "files": 3,
+    "pages": 2,
+    "apiRoutes": 1,
+    "components": 0,
+    "libModules": 0,
+    "models": 1,
+    "clientComponents": 0
+  },
+  "models": [
+    "User"
+  ],
+  "modelUsage": {
+    "User": [
+      "src/app/api/users/route.ts"
+    ]
+  },
+  "pages": [
+    {
+      "url": "/",
+      "file": "src/app/page.tsx"
+    },
+    {
+      "url": "/blog/:slug",
+      "file": "src/app/blog/[slug]/page.tsx"
+    }
+  ],
+  "apiRoutes": [
+    {
+      "url": "/api/users",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "file": "src/app/api/users/route.ts"
+    }
+  ],
+  "hubs": [],
+  "orphans": [],
+  "topExternals": [
+    {
+      "name": "@",
+      "count": 1
+    }
+  ],
+  "byExt": {
+    ".ts": 1,
+    ".tsx": 2
+  },
+  "usedTs": false,
+  "files": {
+    "src/app/api/users/route.ts": {
+      "kind": "api",
+      "imports": [],
+      "externals": [
+        "@"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": [
+        "User"
+      ],
+      "endpoints": [
+        {
+          "method": "GET",
+          "url": "/api/users"
+        },
+        {
+          "method": "POST",
+          "url": "/api/users"
+        }
+      ]
+    },
+    "src/app/blog/[slug]/page.tsx": {
+      "kind": "page",
+      "imports": [],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": [],
+      "route": "/blog/:slug"
+    },
+    "src/app/page.tsx": {
+      "kind": "page",
+      "imports": [],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": [],
+      "route": "/"
+    }
+  },
+  "schemaVersion": 1,
+  "tool": "cartograph",
+  "version": "0.2.0"
+}

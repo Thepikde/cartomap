@@ -1,15 +1,15 @@
 {
-  "name": "cartograph",
+  "name": "cartomap",
   "version": "0.3.0",
   "description": "A living project memory for AI coding — an always-current, git-tracked map of your codebase so AI assistants (and humans) instantly know what's what.",
   "type": "module",
   "bin": {
-    "cartograph": "bin/cartograph.mjs"
+    "cartomap": "bin/cartomap.mjs"
   },
   "scripts": {
-    "cartograph": "node bin/cartograph.mjs",
+    "cartomap": "node bin/cartomap.mjs",
     "test": "node --test test/build.test.mjs",
-    "selftest": "node bin/cartograph.mjs build"
+    "selftest": "node bin/cartomap.mjs build"
   },
   "keywords": [
     "ai",
@@ -26,12 +26,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Thepikde/cartograph.git"
+    "url": "git+https://github.com/Thepikde/cartomap.git"
   },
   "bugs": {
-    "url": "https://github.com/Thepikde/cartograph/issues"
+    "url": "https://github.com/Thepikde/cartomap/issues"
   },
-  "homepage": "https://github.com/Thepikde/cartograph#readme",
+  "homepage": "https://github.com/Thepikde/cartomap#readme",
   "engines": {
     "node": ">=18"
   },

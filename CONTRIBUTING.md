@@ -1,13 +1,13 @@
-# Contributing to Cartograph
+# Contributing to Cartomap
 
-Thanks for your interest! Cartograph deliberately stays **small, dependency-free, and deterministic**.
+Thanks for your interest! Cartomap deliberately stays **small, dependency-free, and deterministic**.
 
 ## Dev setup
 
 ```bash
-git clone https://github.com/Thepikde/cartograph
-cd cartograph
-npm link        # makes `cartograph` available globally
+git clone https://github.com/Thepikde/cartomap
+cd cartomap
+npm link        # makes `cartomap` available globally
 npm test        # runs the fixture tests (Node's built-in runner)
 ```
 

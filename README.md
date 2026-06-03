@@ -1,8 +1,8 @@
-# 🗺️ Cartograph
+# 🗺️ Cartomap
 
 > A living, always-current map of your codebase — so AI assistants (and humans) instantly know what's what.
 
-Cartograph generates a compact, **git-tracked map** of your project (routes, data models, hubs,
+Cartomap generates a compact, **git-tracked map** of your project (routes, data models, hubs,
 orphaned modules, dependencies) plus a **memory** for decisions and context. It updates
 **automatically on every commit**. Point your AI assistant at it and stop burning tokens
 re-explaining your codebase.
@@ -12,7 +12,7 @@ re-explaining your codebase.
 ## Why
 
 Large codebases confuse AI assistants — they guess, hallucinate APIs, and miss cross-cutting
-concerns. Cartograph hands them (and new teammates) a **~2–4k-token map** instead of 100k+ tokens of
+concerns. Cartomap hands them (and new teammates) a **~2–4k-token map** instead of 100k+ tokens of
 raw files.
 
 - Set it up **on day one** → the memory grows organically with your project, "perfect from the start".
@@ -24,7 +24,7 @@ Both are first-class.
 
 **New project (ideal — memory from day one):**
 ```bash
-cartograph new my-app      # creates the folder + git + Cartograph scaffold
+cartomap new my-app      # creates the folder + git + Cartomap scaffold
 cd my-app
 # now build your project as usual (npx create-next-app ., cargo init, …)
 # the map grows with every commit
@@ -33,16 +33,16 @@ cd my-app
 **Existing project:**
 ```bash
 cd my-project
-cartograph init            # detects your stack, builds the map, installs the auto-update hook
+cartomap init            # detects your stack, builds the map, installs the auto-update hook
 ```
 
-That's it. Cartograph writes `.cartograph/` and wires a pre-commit hook so the map stays current —
+That's it. Cartomap writes `.cartomap/` and wires a pre-commit hook so the map stays current —
 automatically, on every commit.
 
 ## What you get
 
 ```
-.cartograph/
+.cartomap/
   ARCHITECTURE.md   # the map: routes, data models, hubs, orphaned modules, top deps
   graph.json        # machine-readable graph
   memory/
@@ -54,7 +54,7 @@ Plus a `## Project map` block added to your `CLAUDE.md` / `AGENTS.md` telling th
 
 ## How it adapts to *your* project
 
-Cartograph auto-detects language, framework, source roots and path aliases, then picks an analyzer:
+Cartomap auto-detects language, framework, source roots and path aliases, then picks an analyzer:
 
 - **TypeScript / JavaScript → deep analysis** (real TS compiler): resolved imports, exports,
   **routes** (Next.js App **and** Pages Router, NestJS controllers, Express/Fastify/Koa),
@@ -63,16 +63,16 @@ Cartograph auto-detects language, framework, source roots and path aliases, then
 - **Everything else → broad structural analysis**: file graph + import heuristics for Python, Go,
   Rust, PHP, Ruby, Java/Kotlin, C/C++, C# + a docs scan.
 
-Everything is config-driven via `cartograph.config.json` (roots, aliases, watched "critical" paths, …).
+Everything is config-driven via `cartomap.config.json` (roots, aliases, watched "critical" paths, …).
 
 ## Auto-update
 
 A pre-commit hook rebuilds the map on every commit and stages it, so it never goes stale — and it
-**never blocks your commit**. It's committed into the repo (`.cartograph/hooks/`), so it's
-team-friendly; teammates just run `cartograph install-hook` once per checkout.
+**never blocks your commit**. It's committed into the repo (`.cartomap/hooks/`), so it's
+team-friendly; teammates just run `cartomap install-hook` once per checkout.
 
 **Plays nice with existing setups:** if you already use **Husky**, **lefthook**, or a custom
-git hook, Cartograph *hooks into* your existing `pre-commit` instead of replacing it — your other
+git hook, Cartomap *hooks into* your existing `pre-commit` instead of replacing it — your other
 hooks keep working.
 
 > `graph.json` is `.gitignore`d by default (rebuilt locally); only the human-readable
@@ -81,36 +81,36 @@ hooks keep working.
 ## Commands
 
 ```
-cartograph init [--no-hook]          Set up in the current project (empty or existing)
-cartograph new <name>                Create a new project with Cartograph from day one
-cartograph build [--quiet] [--verbose]   (Re)build the map (--verbose lists files that failed to parse)
-cartograph install-hook              Enable auto-update on every commit
-cartograph help
+cartomap init [--no-hook]          Set up in the current project (empty or existing)
+cartomap new <name>                Create a new project with Cartomap from day one
+cartomap build [--quiet] [--verbose]   (Re)build the map (--verbose lists files that failed to parse)
+cartomap install-hook              Enable auto-update on every commit
+cartomap help
 ```
 
-The generated map is **English** by default; set `"lang": "de"` in `cartograph.config.json` for German.
+The generated map is **English** by default; set `"lang": "de"` in `cartomap.config.json` for German.
 
 ## Install
 
 **From source (today):**
 ```bash
-git clone https://github.com/Thepikde/cartograph
-cd cartograph && npm link    # makes `cartograph` available globally
+git clone https://github.com/Thepikde/cartomap
+cd cartomap && npm link    # makes `cartomap` available globally
 ```
 
 _(An npm package is on the roadmap.)_
 
 ## Claude Code plugin
 
-Cartograph ships a [Claude Code](https://claude.com/claude-code) plugin — two slash commands plus a
-**skill** that makes any AI session read the map first when working in a Cartograph project:
+Cartomap ships a [Claude Code](https://claude.com/claude-code) plugin — two slash commands plus a
+**skill** that makes any AI session read the map first when working in a Cartomap project:
 
 ```
-/plugin marketplace add Thepikde/cartograph
-/plugin install cartograph@cartograph
+/plugin marketplace add Thepikde/cartomap
+/plugin install cartomap@cartomap
 ```
 
-Then use **`/cartograph:init`** (set up the map) and **`/cartograph:update`** (rebuild it).
+Then use **`/cartomap:init`** (set up the map) and **`/cartomap:update`** (rebuild it).
 
 ## Requirements
 
@@ -119,7 +119,7 @@ available in your project (most TS projects already do).
 
 ## Roadmap
 
-- npm package (`npx cartograph …`)
+- npm package (`npx cartomap …`)
 - More language heuristics, interactive `graph.html`, MCP server for live graph queries
 
 ## License

@@ -1,5 +1,5 @@
 {
-  "name": "cartograph",
+  "name": "cartomap",
   "language": "javascript",
   "framework": "none",
   "adapter": "typescript",
@@ -10,8 +10,10 @@
   ],
   "aliases": {},
   "watch": [],
+  "ignore": [],
   "docs": [
     "README.md"
   ],
-  "out": ".cartograph"
+  "lang": "en",
+  "out": ".cartomap"
 }

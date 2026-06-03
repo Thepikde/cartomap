@@ -1,0 +1,25 @@
+{
+  "name": "empty",
+  "generatedBy": "cartograph",
+  "stats": {
+    "files": 0,
+    "pages": 0,
+    "apiRoutes": 0,
+    "components": 0,
+    "libModules": 0,
+    "models": 0,
+    "clientComponents": 0
+  },
+  "models": [],
+  "modelUsage": {},
+  "pages": [],
+  "apiRoutes": [],
+  "hubs": [],
+  "orphans": [],
+  "topExternals": [],
+  "byExt": {},
+  "files": {},
+  "schemaVersion": 1,
+  "tool": "cartograph",
+  "version": "0.2.0"
+}

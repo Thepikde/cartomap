@@ -1,0 +1,80 @@
+{
+  "name": "express",
+  "generatedBy": "cartograph",
+  "stats": {
+    "files": 1,
+    "pages": 0,
+    "apiRoutes": 3,
+    "components": 0,
+    "libModules": 0,
+    "models": 0,
+    "clientComponents": 0
+  },
+  "models": [],
+  "modelUsage": {},
+  "pages": [],
+  "apiRoutes": [
+    {
+      "url": "/health",
+      "methods": [
+        "GET"
+      ],
+      "file": "src/index.ts"
+    },
+    {
+      "url": "/users",
+      "methods": [
+        "POST"
+      ],
+      "file": "src/index.ts"
+    },
+    {
+      "url": "/users/:id",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "src/index.ts"
+    }
+  ],
+  "hubs": [],
+  "orphans": [],
+  "topExternals": [
+    {
+      "name": "express",
+      "count": 1
+    }
+  ],
+  "byExt": {
+    ".ts": 1
+  },
+  "usedTs": false,
+  "files": {
+    "src/index.ts": {
+      "kind": "api",
+      "imports": [],
+      "externals": [
+        "express"
+      ],
+      "exports": [],
+      "isClient": false,
+      "models": [],
+      "endpoints": [
+        {
+          "method": "GET",
+          "url": "/health"
+        },
+        {
+          "method": "POST",
+          "url": "/users"
+        },
+        {
+          "method": "DELETE",
+          "url": "/users/:id"
+        }
+      ]
+    }
+  },
+  "schemaVersion": 1,
+  "tool": "cartograph",
+  "version": "0.2.0"
+}

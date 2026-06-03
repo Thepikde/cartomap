@@ -1,0 +1,79 @@
+{
+  "name": "next-pages",
+  "generatedBy": "cartograph",
+  "stats": {
+    "files": 3,
+    "pages": 2,
+    "apiRoutes": 1,
+    "components": 0,
+    "libModules": 0,
+    "models": 0,
+    "clientComponents": 0
+  },
+  "models": [],
+  "modelUsage": {},
+  "pages": [
+    {
+      "url": "/",
+      "file": "pages/index.tsx"
+    },
+    {
+      "url": "/blog/:slug",
+      "file": "pages/blog/[slug].tsx"
+    }
+  ],
+  "apiRoutes": [
+    {
+      "url": "/api/users",
+      "methods": [
+        "ALL"
+      ],
+      "file": "pages/api/users.ts"
+    }
+  ],
+  "hubs": [],
+  "orphans": [],
+  "topExternals": [],
+  "byExt": {
+    ".ts": 1,
+    ".tsx": 2
+  },
+  "usedTs": false,
+  "files": {
+    "pages/api/users.ts": {
+      "kind": "api",
+      "imports": [],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": [],
+      "endpoints": [
+        {
+          "method": "ALL",
+          "url": "/api/users"
+        }
+      ]
+    },
+    "pages/blog/[slug].tsx": {
+      "kind": "page",
+      "imports": [],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": [],
+      "route": "/blog/:slug"
+    },
+    "pages/index.tsx": {
+      "kind": "page",
+      "imports": [],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": [],
+      "route": "/"
+    }
+  },
+  "schemaVersion": 1,
+  "tool": "cartograph",
+  "version": "0.2.0"
+}

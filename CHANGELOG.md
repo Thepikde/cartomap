@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Cartograph are documented here. Versions follow [SemVer](https://semver.org).
+All notable changes to Cartomap are documented here. Versions follow [SemVer](https://semver.org).
 
 ## 0.3.0
 ### Added

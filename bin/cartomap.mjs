@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Cartograph CLI — a living project memory for AI coding.
-//   cartograph init [--no-hook]   set up Cartograph in the current project (empty or existing)
-//   cartograph new <name>         create a new project with Cartograph from day one
-//   cartograph build [--quiet] [--verbose]   (re)build the map
-//   cartograph install-hook       enable auto-update on every commit
-//   cartograph help
+// Cartomap CLI — a living project memory for AI coding.
+//   cartomap init [--no-hook]   set up Cartomap in the current project (empty or existing)
+//   cartomap new <name>         create a new project with Cartomap from day one
+//   cartomap build [--quiet] [--verbose]   (re)build the map
+//   cartomap install-hook       enable auto-update on every commit
+//   cartomap help
 
 import { init, newProject } from "../lib/init.mjs";
 import { build } from "../lib/build.mjs";
@@ -16,23 +16,23 @@ const flags = new Set(argv.filter((a) => a.startsWith("--")));
 const args = argv.slice(1).filter((a) => !a.startsWith("--"));
 const cwd = process.cwd();
 
-const HELP = `🗺️  Cartograph — a living, always-current map of your codebase for AI coding.
+const HELP = `🗺️  Cartomap — a living, always-current map of your codebase for AI coding.
 
 Usage:
-  cartograph init [--no-hook]   Set up Cartograph here (works in an empty OR existing project)
-  cartograph new <name>         Create a new project with Cartograph from day one
-  cartograph build [--quiet]    (Re)build the map into .cartograph/   (--verbose lists parse errors)
-  cartograph install-hook       Enable auto-update on every git commit
-  cartograph help               Show this help
+  cartomap init [--no-hook]   Set up Cartomap here (works in an empty OR existing project)
+  cartomap new <name>         Create a new project with Cartomap from day one
+  cartomap build [--quiet]    (Re)build the map into .cartomap/   (--verbose lists parse errors)
+  cartomap install-hook       Enable auto-update on every git commit
+  cartomap help               Show this help
 
-The map lives in .cartograph/ (ARCHITECTURE.md) and is committed to git, so your whole team and any
+The map lives in .cartomap/ (ARCHITECTURE.md) and is committed to git, so your whole team and any
 AI assistant share the same, always-current understanding of the project. Set lang to "de" in
-cartograph.config.json for a German map.`;
+cartomap.config.json for a German map.`;
 
 function reportHook(r) {
   if (!r.ok) return console.log("✗ No git repo found. Run `git init` first, then try again.");
   if (r.mode === "chained") return console.log(`✓ Hooked into your existing ${r.into} pre-commit hook (your other hooks keep working).`);
-  return console.log("✓ Auto-update hook installed (core.hooksPath → .cartograph/hooks).");
+  return console.log("✓ Auto-update hook installed (core.hooksPath → .cartomap/hooks).");
 }
 
 async function main() {
@@ -42,7 +42,7 @@ async function main() {
       break;
     case "new":
       if (!args[0]) {
-        console.error("✗ Missing name:  cartograph new <name>");
+        console.error("✗ Missing name:  cartomap new <name>");
         process.exit(1);
       }
       await newProject(args[0], cwd);

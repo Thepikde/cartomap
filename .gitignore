@@ -11,6 +11,6 @@ node_modules/
 /tmp-*/
 /sandbox/
 
-# Test-Artefakte: build() schreibt .cartograph in jede Fixture
-test/fixtures/*/.cartograph/
-test/fixtures/*/cartograph.config.json
+# Test-Artefakte: build() schreibt .cartomap in jede Fixture
+test/fixtures/*/.cartomap/
+test/fixtures/*/cartomap.config.json

@@ -1,0 +1,47 @@
+{
+  "name": "python",
+  "generatedBy": "cartograph",
+  "stats": {
+    "files": 2,
+    "pages": 0,
+    "apiRoutes": 0,
+    "components": 0,
+    "libModules": 0,
+    "models": 0,
+    "clientComponents": 0
+  },
+  "models": [],
+  "modelUsage": {},
+  "pages": [],
+  "apiRoutes": [],
+  "hubs": [],
+  "orphans": [
+    "app.py",
+    "util.py"
+  ],
+  "topExternals": [],
+  "byExt": {
+    ".py": 2
+  },
+  "files": {
+    "app.py": {
+      "kind": "source",
+      "imports": [],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    },
+    "util.py": {
+      "kind": "source",
+      "imports": [],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": []
+    }
+  },
+  "schemaVersion": 1,
+  "tool": "cartograph",
+  "version": "0.2.0"
+}

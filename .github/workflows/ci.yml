@@ -19,4 +19,4 @@ jobs:
       - name: Run tests
         run: npm test
       - name: Self-build (smoke test)
-        run: node bin/cartograph.mjs build
+        run: node bin/cartomap.mjs build

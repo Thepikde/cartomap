@@ -1,0 +1,67 @@
+{
+  "name": "nestjs",
+  "generatedBy": "cartograph",
+  "stats": {
+    "files": 1,
+    "pages": 0,
+    "apiRoutes": 2,
+    "components": 0,
+    "libModules": 0,
+    "models": 0,
+    "clientComponents": 0
+  },
+  "models": [],
+  "modelUsage": {},
+  "pages": [],
+  "apiRoutes": [
+    {
+      "url": "/users",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "file": "src/users.controller.ts"
+    },
+    {
+      "url": "/users/:id",
+      "methods": [
+        "GET"
+      ],
+      "file": "src/users.controller.ts"
+    }
+  ],
+  "hubs": [],
+  "orphans": [],
+  "topExternals": [],
+  "byExt": {
+    ".ts": 1
+  },
+  "usedTs": false,
+  "files": {
+    "src/users.controller.ts": {
+      "kind": "api",
+      "imports": [],
+      "externals": [],
+      "exports": [],
+      "isClient": false,
+      "models": [],
+      "endpoints": [
+        {
+          "method": "GET",
+          "url": "/users"
+        },
+        {
+          "method": "GET",
+          "url": "/users/:id"
+        },
+        {
+          "method": "POST",
+          "url": "/users"
+        }
+      ]
+    }
+  },
+  "schemaVersion": 1,
+  "tool": "cartograph",
+  "version": "0.2.0"
+}

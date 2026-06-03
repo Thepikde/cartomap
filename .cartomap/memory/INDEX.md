@@ -1,4 +1,4 @@
-# 📚 Project Memory — cartograph
+# 📚 Project Memory — cartomap
 
 Living knowledge that is **not** derivable from code: decisions, the "why", conventions, open
 points, gotchas. Lives **in git** → the whole team and the AI share the same state.
