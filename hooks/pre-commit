@@ -10,14 +10,14 @@ if [ -z "$CARTO" ] && command -v npx >/dev/null 2>&1; then
   CARTO="npx --no-install cartograph"
 fi
 if [ -z "$CARTO" ]; then
-  echo "ℹ️  Cartograph nicht gefunden — Karte nicht aktualisiert. (npm i -g cartograph)"
+  echo "ℹ️  Cartograph not found — map not updated. (npm i -g cartograph)"
   exit 0
 fi
 
-# Karte neu bauen (gibt bei kritischen Änderungen ohne memory/-Notiz einen Hinweis aus)
-$CARTO build --quiet || { echo "⚠️  Cartograph-Build fehlgeschlagen — Karte evtl. veraltet (Commit läuft weiter)."; exit 0; }
+# Rebuild the map (also warns on critical changes without a memory/ note)
+$CARTO build --quiet || { echo "⚠️  Cartograph build failed — map may be stale (commit continues)."; exit 0; }
 
-# aktualisierte Karte in denselben Commit aufnehmen
-git add "$ROOT/.cartograph/ARCHITECTURE.md" "$ROOT/.cartograph/graph.json" 2>/dev/null
+# aktualisierte Karte in denselben Commit aufnehmen (graph.json ist .gitignore'd → nur die Karte)
+git add "$ROOT/.cartograph/ARCHITECTURE.md" 2>/dev/null
 
 exit 0

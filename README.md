@@ -70,15 +70,24 @@ A pre-commit hook rebuilds the map on every commit and stages it, so it never go
 **never blocks your commit**. It's committed into the repo (`.cartograph/hooks/`), so it's
 team-friendly; teammates just run `cartograph install-hook` once per checkout.
 
+**Plays nice with existing setups:** if you already use **Husky**, **lefthook**, or a custom
+git hook, Cartograph *hooks into* your existing `pre-commit` instead of replacing it — your other
+hooks keep working.
+
+> `graph.json` is `.gitignore`d by default (rebuilt locally); only the human-readable
+> `ARCHITECTURE.md` and `memory/` are versioned, keeping diffs small.
+
 ## Commands
 
 ```
-cartograph init            Set up in the current project (empty or existing)
-cartograph new <name>      Create a new project with Cartograph from day one
-cartograph build           (Re)build the map into .cartograph/   [--quiet]
-cartograph install-hook    Enable auto-update on every commit
+cartograph init [--no-hook]          Set up in the current project (empty or existing)
+cartograph new <name>                Create a new project with Cartograph from day one
+cartograph build [--quiet] [--verbose]   (Re)build the map (--verbose lists files that failed to parse)
+cartograph install-hook              Enable auto-update on every commit
 cartograph help
 ```
+
+The generated map is **English** by default; set `"lang": "de"` in `cartograph.config.json` for German.
 
 ## Install
 

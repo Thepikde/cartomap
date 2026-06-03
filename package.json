@@ -1,6 +1,6 @@
 {
   "name": "cartograph",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A living project memory for AI coding — an always-current, git-tracked map of your codebase so AI assistants (and humans) instantly know what's what.",
   "type": "module",
   "bin": {
@@ -29,7 +29,6 @@
   "files": [
     "bin",
     "lib",
-    "hooks",
-    "templates"
+    "hooks"
   ]
 }

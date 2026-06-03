@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Cartograph CLI — a living project memory for AI coding.
-//   cartograph init            set up Cartograph in the current project (empty or existing)
-//   cartograph new <name>      create a new project folder with Cartograph from day 1
-//   cartograph build           (re)build the map  [--quiet]
-//   cartograph install-hook    enable auto-update on every commit
+//   cartograph init [--no-hook]   set up Cartograph in the current project (empty or existing)
+//   cartograph new <name>         create a new project with Cartograph from day one
+//   cartograph build [--quiet] [--verbose]   (re)build the map
+//   cartograph install-hook       enable auto-update on every commit
 //   cartograph help
 
 import { init, newProject } from "../lib/init.mjs";
@@ -19,34 +19,39 @@ const cwd = process.cwd();
 const HELP = `🗺️  Cartograph — a living, always-current map of your codebase for AI coding.
 
 Usage:
-  cartograph init            Set up Cartograph here (works in an empty OR existing project)
-  cartograph new <name>      Create a new project folder with Cartograph from day 1
-  cartograph build           (Re)build the map into .cartograph/   [--quiet]
-  cartograph install-hook    Enable auto-update on every git commit
-  cartograph help            Show this help
+  cartograph init [--no-hook]   Set up Cartograph here (works in an empty OR existing project)
+  cartograph new <name>         Create a new project with Cartograph from day one
+  cartograph build [--quiet]    (Re)build the map into .cartograph/   (--verbose lists parse errors)
+  cartograph install-hook       Enable auto-update on every git commit
+  cartograph help               Show this help
 
-The map lives in .cartograph/ (ARCHITECTURE.md + graph.json) and is committed to git, so your
-whole team and any AI assistant share the same, always-current understanding of the project.`;
+The map lives in .cartograph/ (ARCHITECTURE.md) and is committed to git, so your whole team and any
+AI assistant share the same, always-current understanding of the project. Set lang to "de" in
+cartograph.config.json for a German map.`;
+
+function reportHook(r) {
+  if (!r.ok) return console.log("✗ No git repo found. Run `git init` first, then try again.");
+  if (r.mode === "chained") return console.log(`✓ Hooked into your existing ${r.into} pre-commit hook (your other hooks keep working).`);
+  return console.log("✓ Auto-update hook installed (core.hooksPath → .cartograph/hooks).");
+}
 
 async function main() {
   switch (cmd) {
     case "init":
-      await init(cwd);
+      await init(cwd, { withHook: !flags.has("--no-hook") });
       break;
     case "new":
       if (!args[0]) {
-        console.error("✗ Name fehlt:  cartograph new <name>");
+        console.error("✗ Missing name:  cartograph new <name>");
         process.exit(1);
       }
       await newProject(args[0], cwd);
       break;
     case "build":
-      await build(cwd, { quiet: flags.has("--quiet") });
+      await build(cwd, { quiet: flags.has("--quiet"), verbose: flags.has("--verbose") });
       break;
     case "install-hook":
-      console.log(installHook(cwd)
-        ? "✓ Auto-Update-Hook aktiv (core.hooksPath → .cartograph/hooks)."
-        : "✗ Kein git-Repo gefunden. Erst `git init`, dann erneut versuchen.");
+      reportHook(installHook(cwd));
       break;
     case "help":
     case "--help":
@@ -55,7 +60,7 @@ async function main() {
       console.log(HELP);
       break;
     default:
-      console.error(`✗ Unbekannter Befehl: ${cmd}\n`);
+      console.error(`✗ Unknown command: ${cmd}\n`);
       console.log(HELP);
       process.exit(1);
   }
