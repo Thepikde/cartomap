@@ -1,6 +1,12 @@
 # 🗺️ Cartomap
 
+[![npm version](https://img.shields.io/npm/v/cartomap.svg)](https://www.npmjs.com/package/cartomap)
+[![CI](https://github.com/Thepikde/cartomap/actions/workflows/ci.yml/badge.svg)](https://github.com/Thepikde/cartomap/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/npm/l/cartomap.svg)](LICENSE)
+
 > A living, always-current map of your codebase — so AI assistants (and humans) instantly know what's what.
+
+**Install:** `npm i -g cartomap` — or run directly with `npx cartomap init`
 
 Cartomap generates a compact, **git-tracked map** of your project (routes, data models, hubs,
 orphaned modules, dependencies) plus a **memory** for decisions and context. It updates
@@ -92,13 +98,17 @@ The generated map is **English** by default; set `"lang": "de"` in `cartomap.con
 
 ## Install
 
-**From source (today):**
 ```bash
-git clone https://github.com/Thepikde/cartomap
-cd cartomap && npm link    # makes `cartomap` available globally
+npm i -g cartomap     # then: cartomap init
+# or run without installing:
+npx cartomap init
 ```
 
-_(An npm package is on the roadmap.)_
+Or from source:
+```bash
+git clone https://github.com/Thepikde/cartomap
+cd cartomap && npm link
+```
 
 ## Claude Code plugin
 
@@ -119,9 +129,8 @@ available in your project (most TS projects already do).
 
 ## Roadmap
 
-- npm package (`npx cartomap …`)
 - More language heuristics, interactive `graph.html`, MCP server for live graph queries
 
 ## License
 
-MIT © Nderim Selmanaj
+MIT © ThePik
