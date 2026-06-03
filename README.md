@@ -57,8 +57,9 @@ Plus a `## Project map` block added to your `CLAUDE.md` / `AGENTS.md` telling th
 Cartograph auto-detects language, framework, source roots and path aliases, then picks an analyzer:
 
 - **TypeScript / JavaScript → deep analysis** (real TS compiler): resolved imports, exports,
-  Next.js routes, Prisma/Drizzle models, client/server components. `typescript` is loaded from your
-  project if present; otherwise a lighter regex pass is used (still works).
+  **routes** (Next.js App **and** Pages Router, NestJS controllers, Express/Fastify/Koa),
+  Prisma/Drizzle models, client/server components. `typescript` is loaded from your project if
+  present; otherwise a lighter regex pass is used (still works).
 - **Everything else → broad structural analysis**: file graph + import heuristics for Python, Go,
   Rust, PHP, Ruby, Java/Kotlin, C/C++, C# + a docs scan.
 

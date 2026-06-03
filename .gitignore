@@ -10,3 +10,7 @@ node_modules/
 # Lokale Test-Spielwiese (Dogfooding-Ordner)
 /tmp-*/
 /sandbox/
+
+# Test-Artefakte: build() schreibt .cartograph in jede Fixture
+test/fixtures/*/.cartograph/
+test/fixtures/*/cartograph.config.json

@@ -9,8 +9,8 @@ Project knowledge, decisions & open points → [`memory/INDEX.md`](memory/INDEX.
 ## Overview
 | Metric | Value |
 |---|---|
-| Files | 13 |
-| lib/util modules | 12 |
+| Files | 14 |
+| lib/util modules | 13 |
 
 ## Hubs (most imported)
 - lib/adapter-generic.mjs ← 2×
@@ -23,8 +23,8 @@ Project knowledge, decisions & open points → [`memory/INDEX.md`](memory/INDEX.
 - lib/graph.mjs ← 1×
 - lib/init.mjs ← 1×
 - lib/render.mjs ← 1×
+- lib/routes.mjs ← 1×
 - lib/scan.mjs ← 1×
-- lib/walk.mjs ← 1×
 
 ## Top external dependencies
 node:path (10) · node:fs (8) · node:child_process (5) · node:url (2) · node:module (1)
