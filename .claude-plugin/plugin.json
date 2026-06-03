@@ -1,6 +1,6 @@
 {
   "name": "cartomap",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A living, always-current map of your codebase for AI coding. Generates an AI-readable .cartomap/ map (routes, data models, hubs) and keeps it in sync on every commit.",
   "author": {
     "name": "Nderim Selmanaj"
