@@ -3,12 +3,14 @@
 //   cartomap init [--no-hook]   set up Cartomap in the current project (empty or existing)
 //   cartomap new <name>         create a new project with Cartomap from day one
 //   cartomap build [--quiet] [--verbose]   (re)build the map
+//   cartomap affected <file>    show what depends on a file (blast radius of a change)
 //   cartomap install-hook       enable auto-update on every commit
 //   cartomap help
 
 import { init, newProject } from "../lib/init.mjs";
 import { build } from "../lib/build.mjs";
 import { installHook } from "../lib/hook.mjs";
+import { affected } from "../lib/affected.mjs";
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
@@ -22,6 +24,7 @@ Usage:
   cartomap init [--no-hook]   Set up Cartomap here (works in an empty OR existing project)
   cartomap new <name>         Create a new project with Cartomap from day one
   cartomap build [--quiet]    (Re)build the map into .cartomap/   (--verbose lists parse errors)
+  cartomap affected <file>    Show what depends on a file — the blast radius of changing it (--json)
   cartomap install-hook       Enable auto-update on every git commit
   cartomap help               Show this help
 
@@ -49,6 +52,13 @@ async function main() {
       break;
     case "build":
       await build(cwd, { quiet: flags.has("--quiet"), verbose: flags.has("--verbose") });
+      break;
+    case "affected":
+      if (!args[0]) {
+        console.error("✗ Missing file:  cartomap affected <path>");
+        process.exit(1);
+      }
+      await affected(cwd, args[0], { json: flags.has("--json") });
       break;
     case "install-hook":
       reportHook(installHook(cwd));

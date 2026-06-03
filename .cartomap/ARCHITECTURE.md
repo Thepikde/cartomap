@@ -6,28 +6,33 @@ Project knowledge, decisions & open points → [`memory/INDEX.md`](memory/INDEX.
 
 **Docs:** [`README.md`](../README.md)
 
+## Start here
+Entry points — where to start reading:
+- `bin/cartomap.mjs` — CLI entry (package.json bin)
+
 ## Overview
 | Metric | Value |
 |---|---|
-| Files | 14 |
-| lib/util modules | 13 |
+| Files | 16 |
+| lib/util modules | 15 |
 
 ## Hubs (most imported)
-- lib/adapter-generic.mjs ← 2×
-- lib/build.mjs ← 2×
-- lib/config.mjs ← 2×
-- lib/hook.mjs ← 2×
-- lib/adapter-typescript.mjs ← 1×
-- lib/detect.mjs ← 1×
-- lib/gitsync.mjs ← 1×
-- lib/graph.mjs ← 1×
-- lib/init.mjs ← 1×
-- lib/render.mjs ← 1×
-- lib/routes.mjs ← 1×
-- lib/scan.mjs ← 1×
+_Most-imported modules — change with care. "affected" = files that (transitively) import it (static, a lower bound)._
+- lib/config.mjs — 3 direct, 5 affected
+- lib/adapter-generic.mjs — 2 direct, 4 affected
+- lib/affected.mjs — 2 direct, 4 affected
+- lib/build.mjs — 2 direct
+- lib/detect.mjs — 2 direct, 7 affected
+- lib/hook.mjs — 2 direct
+- lib/adapter-typescript.mjs — 1 direct, 3 affected
+- lib/entrypoints.mjs — 1 direct, 3 affected
+- lib/gitsync.mjs — 1 direct, 3 affected
+- lib/graph.mjs — 1 direct, 3 affected
+- lib/init.mjs — 1 direct
+- lib/render.mjs — 1 direct, 3 affected
 
 ## Top external dependencies
-node:path (10) · node:fs (8) · node:child_process (5) · node:url (2) · node:module (1)
+node:path (12) · node:fs (9) · node:child_process (5) · node:url (2) · node:module (1)
 
 ## Orphaned modules
 No incoming imports (possibly dead or only used dynamically):
